@@ -3,7 +3,7 @@ yukari
 
 Beware
 ------
-This piece of software is _not_ yet in a usable state. I mean this in a `it's missing nearly all the features and is not usable unless you change the source and recompile` and not in `uh oh, it's not pretty enough yet ;_;` way.
+This piece of software is _not_ yet in an usable state. I mean this in a `it's missing nearly all the features and is not usable unless you change the source and recompile` and not in `uh oh, it's not pretty enough yet ;_;` way.
 
 Most configuration is currently done in the source and the program is recompiled with each change. The aim is to provide command line control and config file(s). An easier to implement alternative would be to have a Settings module that the user is expected to use to provide the configuration for every setting in the program. The type system would be used to ensure that all settings provided. The user benefit of this is that the user is guaranteed not to have missed something and many of the settings are very unlikely to frequently change anyway. The downside is that binaries can no longer be distributed and that the user needs access to a Haskell compiler as well as having all the dependencies.
 
@@ -121,13 +121,13 @@ This feature is partially finished. For some preferences we can use the site's s
 * Fetching named torrents:
 This feature is similar to `Fetching generic torrents`. The difference is that the torrent name setting is required. This allows to greatly narrow the number of torrents that have to be looked through thanks to the site's in-built search.
 * Custom torrent filtering:
-The program should be able to take user preferences which will then be used to filter the torrents obtained from othe parts of the program. The filtering should work on virtually all types of information that a torrent data type holds.
+The program should be able to take user preferences which will then be used to filter the torrents obtained from other parts of the program. The filtering should work on virtually all types of information that a torrent data type holds.
 This feature is finished.
 * Per torrent group preferences:
 In conjunction with `Fetching named torrents` feature, this will allow the user to specify a preferred torrent from a group. This means that only a single torrent from a group is picked. The best torrent is decided based on user provided preferences. The user should also be able to override the `single torrent` restriction and specify either the number of best torrents, all torrents that fit the preference, or both.
 This feature has not been started on.
 * Inbox processing:
-This feature aims to process some of the stock System messages and act upon them accordingly. Given a `torrent removed` message, the program could be set up so that it stops the torrent and removes it from the torrent client. This is however difficult to do. Many torrent clients don't have means of such communication, and those that do aren't very easy to talk either. Furthermore, the program would have to automagically know which torrent on the site responds to which torrent locally and in the torrent client. There would have to be a database involved and set up on the torrent client side. For these reasons, it's unlikely that this feature will be implemented.
+This feature aims to process some of the stock System messages and act upon them accordingly. Given a `torrent removed` message, the program could be set up so that it stops the torrent and removes it from the torrent client. This is however difficult to do. Many torrent clients don't have means of such communication, and those that do aren't very easy to talk either. Furthermore, the program would have to auto-magically know which torrent on the site responds to which torrent locally and in the torrent client. There would have to be a database involved and set up on the torrent client side. For these reasons, it's unlikely that this feature will be implemented.
 * Database storage:
 This feature would let the program store information in local database. This would involve all the information about every torrent seen and fetched. The advantages:
 + Don't have to parse all torrents on the site every time we want to do a massive fetch and we don't care about getting every single torrent
@@ -148,7 +148,7 @@ For all of the above reasons, I'm unsure whether a database should be put in pla
 General issues with the program
 ------
 This section will briefly describe what needs to be done with the program as a whole.
-* login verification -- the program doesn't test for successful login which results in a parsing exception later
+* log-in verification -- the program doesn't test for successful log-in which results in a parsing exception later
 * proper exception handling throughout the code -- currently the program exits on a failed download
 * more robust parsing -- given an incorrect page, the program will simply crash when the parser fails to read something; it would be more favourable to skip the page (while notifying the user) rather than have it abort in the middle of a large fetch job; given a torrent with data that was not accounted for at compile time will result in similar behaviour; I can't ensure that AnimeBytes doesn't change the formatting on the site but I should at least be able to be prepared for it instead of finding out the hard way
 * work out the exact settings I want to let the user change and how to let them change it -- e.g. simply letting the user pass in [CurlOptions] vs just letting them pass some data that we can then use as argument to curl (such as up/down speed)
