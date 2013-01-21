@@ -93,49 +93,49 @@ See below for a table of features and their status. A brief explanation of each 
 Feature overview
 ------
 Below is a description of the features mentioned in the previous section. This section aims to explain what the different features are and their current state. For the state of the program as a whole, see the next section. In places where I talk about supplying configuration/preferences, I mean the ability to do so, without regard on how it is actually done at this stage.
-* Spending yen:
+* Spending yen <br />
 The program should be able to log in, go to the store and spend the yen on upload or donate to the freeleech pool. The user should be able to supply the minimum amount of yen they want to have left over. There is no plan to allow the user to spend the yen on anything else.
 Currently the program is able to spend yen on upload but not on freeleech.
 
-* Sending yen to users:
+* Sending yen to users <br />
 Yukari should be able to send a user-specified amount of yen to a specified user. The user should be able to pass in the minimum amount of yen left over, other person's username and the amount of yen to send, either with or without the site tax accounted for. The yen will not be sent if the user doesn't have enough or sending would go under the minimum amount specified.
 This feature has not been started on.
-* Sending messages to users:
+* Sending messages to users <br />
 Given a username, subject and text, yukari should be able to send that user a message with given information.
 This feature has not been started on.
-* Reading mailbox messages:
+* Reading mailbox messages <br />
 Given a number `n`, yukari should be able to display the nth message from the most recent one gotten. She should also be able to simply print inbox content with the messages number.
 This feature has not been started on.
-* Viewing basic user information:
+* Viewing basic user information <br />
 Given a username, yukari should be able to fetch a user's info and output it to the terminal. The output will only contain the basic information such as the user's ration and torrent statistics. It should be able to handle users with hidden information.
 This feature has not been started on.
-* Crawling regular torrent pages:
+* Crawling regular torrent pages <br />
 Given a search page, yukari should be able to crawl through all of the results and categorise all seen torrents into appropriate data types. This feature is heavily used by other parts of the program.
 This feature is finished.
-* Crawling music pages:
+* Crawling music pages <br />
 Same as the `Crawling regular torrent pages` feature except for music torrents. This actually used to work transparently but there is now more parsing into types in place as well as more information being retrieved.
 This feature is only partially implemented.
-* Fetching generic torrents:
+* Fetching generic torrents <br />
 This feature will allow the user to fetch all torrents that fit user specified preferences. This essentially uses the `Custom torrent filtering` function on all torrents seen.
 This feature is partially finished. For some preferences we can use the site's search to greatly narrow the search space.
-* Fetching named torrents:
+* Fetching named torrents <br />
 This feature is similar to `Fetching generic torrents`. The difference is that the torrent name setting is required. This allows to greatly narrow the number of torrents that have to be looked through thanks to the site's in-built search.
-* Custom torrent filtering:
+* Custom torrent filtering <br />
 The program should be able to take user preferences which will then be used to filter the torrents obtained from other parts of the program. The filtering should work on virtually all types of information that a torrent data type holds.
 This feature is finished.
-* Per torrent group preferences:
+* Per torrent group preferences <br />
 In conjunction with `Fetching named torrents` feature, this will allow the user to specify a preferred torrent from a group. This means that only a single torrent from a group is picked. The best torrent is decided based on user provided preferences. The user should also be able to override the `single torrent` restriction and specify either the number of best torrents, all torrents that fit the preference, or both.
 This feature has not been started on.
-* Inbox processing:
+* Inbox processing <br />
 This feature aims to process some of the stock System messages and act upon them accordingly. Given a `torrent removed` message, the program could be set up so that it stops the torrent and removes it from the torrent client. This is however difficult to do. Many torrent clients don't have means of such communication, and those that do aren't very easy to talk either. Furthermore, the program would have to auto-magically know which torrent on the site responds to which torrent locally and in the torrent client. There would have to be a database involved and set up on the torrent client side. For these reasons, it's unlikely that this feature will be implemented.
-* Database storage:
-This feature would let the program store information in local database. This would involve all the information about every torrent seen and fetched. The advantages:
+* Database storage <br />
+This feature would let the program store information in local database. This would involve all the information about every torrent seen and fetched. The advantages: <br />
 + Don't have to parse all torrents on the site every time we want to do a massive fetch and we don't care about getting every single torrent
 + Can readily skip torrents we have already fetched in the past
 + Can effectively browse all torrents on the site without even going online
 + Fast, local searches and filters
 + AnimeBytes no longer *shakes fist* at this program's users for unusual bandwidth usage (although this is mitigated by superior (to current) search based on user preference with combination of site search, some things can't be searched for using the site (such as specific number of seeders etc.))
-There are however fair few disadvantages to this:
+There are however fair few disadvantages to this: <br />
 + The database would be fairly large. We would be storing quite a lot of information for each of the ~37000 torrents.
 + The database would have to be updated every now and again. This means going through the couple of hundred of pages every time we want to have a more recent database as we have to be able to remove no longer existing torrents and update all the torrents we currently have stored as well as adding any new ones. This is more of a common courtesy worry in regards to hitting the AB servers. I don't believe it is a big issue unless many, many people do this on frequent basis. It's pretty much the same issue that Linux package repositories have and it seems to work quite well for them.
 + Storing whether we have fetched a torrent is a one way operation only. The program can fetch the torrent and mark it as such in the database, but the torrent client can't do the reverse when it deletes the torrent meaning that we might an up with some incorrect values. An alternative to not mark the torrent as fetched at all. The download operation will skip the torrent if it already exists in the download destination and doesn't download it if it is. This is therefore only an issue if the user wants to see exactly what torrents from AB he/she already has. All in all, I think I will include this but won't actually use this value to decide anything in the program.
