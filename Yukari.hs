@@ -1,0 +1,61 @@
+{-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
+module Main (main) where
+
+import Crawler
+import Settings
+import Types
+import Filters
+import Spender
+import System.FilePath
+import System.Environment
+import System.Exit
+
+searchSettings = SiteSettings { username = ""
+                              , password = ""
+                              , baseSite = "https://yuki.animebytes.tv"
+                              , loginSite = "https://yuki.animebytes.tv/login.php"
+                              , searchSite = "https://yuki.animebytes.tv/torrents.php"
+                              , logVerbosity = Low
+                              , topWatch = Just $ "/mnt" </> "hitagi" </> "watch"
+                              , watchFunc = watchDirs
+                              , filterFunc = torrentFilter
+                              , clobberFiles = False
+                              }
+
+spendSettings = SpendSettings { regularSettings = searchSettings
+                              , yenSite = "https://yuki.animebytes.tv/konbini.php"
+                              , yenLeftOver = 0
+                              }
+
+torrentFilter :: ABTorrent -> Bool
+torrentFilter tor = and $ map (flip id tor) filters
+                    where filters = [ isSeeded
+                                    , isUnderSize (100 * 1024 ^ 2)
+                                    ]
+
+watchDirs :: Category -> Maybe FilePath
+watchDirs cat
+  | cat == Anime = Just "watchanime"
+  | cat == Artbook = Just "watchartbooks"
+  | cat `elem` [Game, GameGuide] = Just "watchgames"
+  | cat `elem` [LightNovel, Novel, Anthology] = Just "watchnovels"
+  | cat == VisualNovel = Just "watchvnovels"
+  | cat `elem` map Music [Single, Soundtrack, MusicDVD, Live, PV, LiveAlbum
+                         , Compilation, Album, DramaCD] = Just "watchmusic"
+  | cat `elem` map Manga [GenericManga, Oneshot, Manhua, Manhwa, OEL] = Just "watchmanga"
+  | otherwise = Nothing
+
+
+
+main = do
+  args <- getArgs
+  progName <- getProgName
+  if (length args /= 2)
+    then (putStrLn $ "usage: " ++ progName ++ " <username> <password>") >> (exitWith $ ExitFailure 1)
+    else spendYen (spendSettings { regularSettings = ((regularSettings spendSettings) { username = head args
+                                                                                      , password = last args
+                                                                                      })
+                                 })
+ -- crawlFromURL $ searchSettings
+ -- spendYen spendSettings
+
