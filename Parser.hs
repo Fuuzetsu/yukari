@@ -170,9 +170,9 @@ parseYenPage body = do
   let doc = parseHtml body
   yen <- runX $ doc //> hasAttrValue "href" (== "konbini.php") /> getText
   links <- runX $ (doc //> hasName "a" >>> getAttrValue "href") >>. filter isExchange
-  return $ YenPage { yenOwned = yenToInt $ head yen
-                   , spendingLinks = map linksToCostLinks links
-                   }
+  return YenPage { yenOwned = yenToInt $ head yen
+                 , spendingLinks = map linksToCostLinks links
+                 }
     where yenToInt = read . reverse . takeWhile isDigit . reverse . filter (/= ',')
           isExchange = isInfixOf "action=exchange"
           linksToCostLinks x

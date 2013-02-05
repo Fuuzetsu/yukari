@@ -12,8 +12,8 @@ data SiteSettings = SiteSettings { username :: String
                                  , searchSite :: String
                                  , topWatch :: Maybe FilePath
                                  , logVerbosity :: Verbosity
-                                 , watchFunc :: (Category -> Maybe FilePath)
-                                 , filterFunc :: (ABTorrent -> Bool)
+                                 , watchFunc :: Category -> Maybe FilePath
+                                 , filterFunc :: ABTorrent -> Bool
                                  , clobberFiles :: Bool
                                  }
 
@@ -32,7 +32,7 @@ minimalSettings u p l = SiteSettings { username = u
                                      , searchSite = ""
                                      , topWatch = Nothing
                                      , logVerbosity = Low
-                                     , watchFunc = (\_ -> Nothing)
-                                     , filterFunc = (\_ -> True)
+                                     , watchFunc = \_ -> Nothing
+                                     , filterFunc = \_ -> True
                                      , clobberFiles = False
                                      }

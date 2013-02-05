@@ -55,17 +55,17 @@ crawl settings curl url = do
   body <- getInternalPage curl url
   pa@(nextPage, groups) <- parsePage body
   when (logVerbosity settings >= High) (prettyPage pa)
-  when (logVerbosity settings >= Low) (putStrLn $ "Have " ++ show (foldl (+) 0 (map (length . torrents) groups)) ++ " torrents pre-filter.")
+  when (logVerbosity settings >= Low) (putStrLn $ "Have " ++ show (sum (map (length . torrents) groups)) ++ " torrents pre-filter.")
   let filtered = torrentFilter (filterFunc settings) groups
-  let all = concat $ map (buildTorrentPaths settings) filtered
+  let all = concatMap (buildTorrentPaths settings) filtered
   when (logVerbosity settings >= Low) (putStrLn $ "Have " ++ show (length all) ++ " torrents post-filter.")
   mapM_ (\(fp, url) -> download fp url (logVerbosity settings) (clobberFiles settings)) all
   crawl settings curl nextPage
 
 buildTorrentPaths :: SiteSettings -> ABTorrentGroup -> [(Maybe FilePath, URL)]
-buildTorrentPaths set group = map (\x -> (makePath x, torrentDownloadURI x)) $ torrents group
+buildTorrentPaths set group = map (makePath Control.Arrow.&&& torrentDownloadURI) $ torrents group
   where makePath :: ABTorrent -> Maybe FilePath
-        makePath tor = foldl (liftA2 (</>)) (topWatch set) [ (watchFunc set $ torrentCategory group)
+        makePath tor = foldl (liftA2 (</>)) (topWatch set) [ watchFunc set $ torrentCategory group
                                                            , Just (torrentName group ++ " - " ++
                                                                    show (torrentCategory group) ++ " ~ " ++
                                                                    torrentInfoSuffix tor <.> "torrent")
@@ -88,9 +88,9 @@ getSinglePage settings url = logonCurl settings >>= flip getInternalPage url
 
 
 download :: Maybe FilePath -> String -> Verbosity -> Bool -> IO ()
-download path url verb clobber = do
+download path url verb clobber = 
   case path of
-    Nothing -> when (verb >= Low) (putStrLn $ "Skipping empty path.")
+    Nothing -> when (verb >= Low) (putStrLn "Skipping empty path.")
     Just p -> do
       b <- doesFileExist p
       when (verb >= Low && b) (putStrLn $ "Skipping already downloaded " ++ p)

@@ -1,4 +1,4 @@
-{-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
 module Main (main) where
 
 import Crawler
@@ -28,7 +28,7 @@ spendSettings = SpendSettings { regularSettings = searchSettings
                               }
 
 torrentFilter :: ABTorrent -> Bool
-torrentFilter tor = and $ map (flip id tor) filters
+torrentFilter tor = all (`id` tor) filters
                     where filters = [ isSeeded
                                     , isUnderSize (100 * 1024 ^ 2)
                                     ]
@@ -50,12 +50,12 @@ watchDirs cat
 main = do
   args <- getArgs
   progName <- getProgName
-  if (length args /= 2)
-    then (putStrLn $ "usage: " ++ progName ++ " <username> <password>") >> (exitWith $ ExitFailure 1)
-    else spendYen (spendSettings { regularSettings = ((regularSettings spendSettings) { username = head args
+  if length args /= 2
+    then putStrLn ("usage: " ++ progName ++ " <username> <password>") >> exitWith $ ExitFailure 1
+    else spendYen $ spendSettings { regularSettings = (regularSettings spendSettings) { username = head args
                                                                                       , password = last args
-                                                                                      })
-                                 })
+                                                                                      }
+                                 }
  -- crawlFromURL $ searchSettings
  -- spendYen spendSettings
 

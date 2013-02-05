@@ -19,8 +19,8 @@ spendYen ys = do
       when (v >= Low) (putStrLn $ "Spending " ++ show cost ++ " yen.")
       when (v >= High) (putStrLn $ "Spending the yen at " ++ link)
       getSinglePage (regularSettings ys) link >> spendYen ys
-  where attachBase yp = yp { spendingLinks = map (\(c, l) -> (,) c ((baseSite $ regularSettings ys) ++ "/" ++ l)) (spendingLinks yp)}
+  where attachBase yp = yp { spendingLinks = map (\(c, l) -> (,) c (baseSite (regularSettings ys) ++ "/" ++ l)) (spendingLinks yp)}
 
 chooseOptimal :: SpendSettings -> YenPage -> Maybe (Cost, String)
 chooseOptimal ys yp = let l = filterUnwanted ys yp in if null l then Nothing else Just $ foldl (\x@(c, q) y@(d, w) -> if c >= d then x else y) (head l) (tail l)
-  where filterUnwanted st pg = filter (\(c, _) -> (yenOwned pg) - c >= 0 && (yenOwned pg) - c >= (yenLeftOver st)) (spendingLinks pg)
+  where filterUnwanted st pg = filter (\(c, _) -> yenOwned pg - c >= 0 && yenOwned pg - c >= yenLeftOver st) (spendingLinks pg)
