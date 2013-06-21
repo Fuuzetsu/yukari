@@ -12,9 +12,9 @@ import System.Exit
 
 searchSettings = SiteSettings { username = ""
                               , password = ""
-                              , baseSite = "https://yuki.animebytes.tv"
-                              , loginSite = "https://yuki.animebytes.tv/login.php"
-                              , searchSite = "https://yuki.animebytes.tv/torrents.php"
+                              , baseSite = "https://animebytes.tv"
+                              , loginSite = "https://animebytes.tv/login.php"
+                              , searchSite = "https://animebytes.tv/torrents.php"
                               , logVerbosity = Low
                               , topWatch = Just $ "/mnt" </> "hitagi" </> "watch"
                               , watchFunc = watchDirs
@@ -23,7 +23,7 @@ searchSettings = SiteSettings { username = ""
                               }
 
 spendSettings = SpendSettings { regularSettings = searchSettings
-                              , yenSite = "https://yuki.animebytes.tv/konbini.php"
+                              , yenSite = "https://animebytes.tv/konbini.php"
                               , yenLeftOver = 0
                               }
 
@@ -58,4 +58,3 @@ main = do
                                  }
  -- crawlFromURL $ searchSettings
  -- spendYen spendSettings
-
