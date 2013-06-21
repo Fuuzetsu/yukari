@@ -104,27 +104,27 @@ This feature has not been started on.
 Given a username, subject and text, yukari should be able to send that user a message with given information.
 This feature has not been started on.
 * Reading mailbox messages <br />
-Given a number `n`, yukari should be able to display the nth message from the most recent one gotten. She should also be able to simply print inbox content with the messages number.
+Given a number *n*, yukari should be able to display the *n*th message from the most recent one gotten. She should also be able to simply print inbox content with the messages number.
 This feature has not been started on.
 * Viewing basic user information <br />
 Given a username, yukari should be able to fetch a user's info and output it to the terminal. The output will only contain the basic information such as the user's ration and torrent statistics. It should be able to handle users with hidden information.
 This feature has not been started on.
-* Crawling regular torrent pages <br />
+* <a name='crtp'/>Crawling regular torrent pages <br />
 Given a search page, yukari should be able to crawl through all of the results and categorise all seen torrents into appropriate data types. This feature is heavily used by other parts of the program.
 This feature is finished.
 * Crawling music pages <br />
-Same as the `Crawling regular torrent pages` feature except for music torrents. This actually used to work transparently but there is now more parsing into types in place as well as more information being retrieved.
+Same as the [Crawling regular torrent pages](#crtp) feature except for music torrents. This actually used to work transparently but there is now more parsing into types in place as well as more information being retrieved.
 This feature is only partially implemented.
-* Fetching generic torrents <br />
+* <a name='fgt'/>Fetching generic torrents <br />
 This feature will allow the user to fetch all torrents that fit user specified preferences. This essentially uses the `Custom torrent filtering` function on all torrents seen.
 This feature is partially finished. For some preferences we can use the site's search to greatly narrow the search space.
-* Fetching named torrents <br />
-This feature is similar to `Fetching generic torrents`. The difference is that the torrent name setting is required. This allows to greatly narrow the number of torrents that have to be looked through thanks to the site's in-built search.
+* <a name='fnt'/>Fetching named torrents <br />
+This feature is similar to [Fetching generic torrents](#fgt). The difference is that the torrent name setting is required. This allows to greatly narrow the number of torrents that have to be looked through thanks to the site's in-built search.
 * Custom torrent filtering <br />
 The program should be able to take user preferences which will then be used to filter the torrents obtained from other parts of the program. The filtering should work on virtually all types of information that a torrent data type holds.
 This feature is finished.
 * Per torrent group preferences <br />
-In conjunction with `Fetching named torrents` feature, this will allow the user to specify a preferred torrent from a group. This means that only a single torrent from a group is picked. The best torrent is decided based on user provided preferences. The user should also be able to override the `single torrent` restriction and specify either the number of best torrents, all torrents that fit the preference, or both.
+In conjunction with [Fetching named torrents](#fnt) feature, this will allow the user to specify a preferred torrent from a group. This means that only a single torrent from a group is picked. The best torrent is decided based on user provided preferences. The user should also be able to override the `single torrent` restriction and specify either the number of best torrents, all torrents that fit the preference, or both.
 This feature has not been started on.
 * Inbox processing <br />
 This feature aims to process some of the stock System messages and act upon them accordingly. Given a `torrent removed` message, the program could be set up so that it stops the torrent and removes it from the torrent client. This is however difficult to do. Many torrent clients don't have means of such communication, and those that do aren't very easy to talk either. Furthermore, the program would have to auto-magically know which torrent on the site responds to which torrent locally and in the torrent client. There would have to be a database involved and set up on the torrent client side. For these reasons, it's unlikely that this feature will be implemented.
