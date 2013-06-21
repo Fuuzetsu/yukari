@@ -22,7 +22,7 @@ data SpendSettings = SpendSettings { regularSettings :: SiteSettings
                                    , yenLeftOver :: Integer
                                    }
 
-data Verbosity = Quiet | Low | High deriving (Eq, Ord)
+data Verbosity = Quiet | Low | High deriving (Show, Eq, Ord)
 
 minimalSettings :: String -> String -> String -> SiteSettings
 minimalSettings u p l = SiteSettings { username = u
@@ -32,7 +32,7 @@ minimalSettings u p l = SiteSettings { username = u
                                      , searchSite = ""
                                      , topWatch = Nothing
                                      , logVerbosity = Low
-                                     , watchFunc = \_ -> Nothing
-                                     , filterFunc = \_ -> True
+                                     , watchFunc = const Nothing
+                                     , filterFunc = const True
                                      , clobberFiles = False
                                      }
