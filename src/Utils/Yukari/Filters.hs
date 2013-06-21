@@ -1,6 +1,6 @@
-module Filters where
+module Utils.Yukari.Filters where
 
-import Types
+import Utils.Yukari.Types
 import Control.Monad
 
 isSeeded :: ABTorrent -> Bool

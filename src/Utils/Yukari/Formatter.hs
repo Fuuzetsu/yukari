@@ -1,6 +1,6 @@
-module Formatter where
+module Utils.Yukari.Formatter where
 
-import Types
+import Utils.Yukari.Types
 
 prettyGroup :: ABTorrentGroup -> String
 prettyGroup g = torrentName g ++ " - " ++ show (torrentCategory g) ++ "\n" ++

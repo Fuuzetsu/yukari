@@ -1,4 +1,4 @@
-module Crawler (crawlFromURL, crawlFromFile, getSinglePage) where
+module Utils.Yukari.Crawler (crawlFromURL, crawlFromFile, getSinglePage) where
 
 import Network.Curl
 import Network.Curl.Download
@@ -9,10 +9,10 @@ import Control.Monad
 import Control.Applicative
 import qualified Data.ByteString as BS
 
-import Parser
-import Types
-import Settings
-import Formatter
+import Utils.Yukari.Parser
+import Utils.Yukari.Types
+import Utils.Yukari.Settings
+import Utils.Yukari.Formatter
 import Control.Concurrent
 
 

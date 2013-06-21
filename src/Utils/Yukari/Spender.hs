@@ -1,9 +1,9 @@
-module Spender (spendYen) where
+module Utils.Yukari.Spender (spendYen) where
 
-import Settings
-import Crawler (getSinglePage)
-import Parser (parseYenPage)
-import Types
+import Utils.Yukari.Settings
+import Utils.Yukari.Crawler (getSinglePage)
+import Utils.Yukari.Parser (parseYenPage)
+import Utils.Yukari.Types
 import Control.Monad
 
 spendYen :: SpendSettings -> IO ()

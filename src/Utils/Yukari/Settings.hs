@@ -1,6 +1,6 @@
-module Settings where
+module Utils.Yukari.Settings where
 
-import Types (Category, ABTorrent)
+import Utils.Yukari.Types (Category, ABTorrent)
 import System.FilePath
 import Data.Maybe
 

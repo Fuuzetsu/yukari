@@ -1,11 +1,11 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
 module Main (main) where
 
-import Crawler
-import Settings
-import Types
-import Filters
-import Spender
+import Utils.Yukari.Crawler
+import Utils.Yukari.Settings
+import Utils.Yukari.Types
+import Utils.Yukari.Filters
+import Utils.Yukari.Spender
 import System.FilePath
 import System.Environment
 import System.Exit

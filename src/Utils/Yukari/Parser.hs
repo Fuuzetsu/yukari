@@ -1,8 +1,8 @@
 {-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
 
-module Parser (parsePage, parseYenPage) where
+module Utils.Yukari.Parser (parsePage, parseYenPage) where
 
-import Types
+import Utils.Yukari.Types
 import Text.XML.HXT.Core
 import Text.HandsomeSoup
 import Data.List
@@ -11,7 +11,7 @@ import Data.Char
 import Data.Text (pack, unpack, split)
 import System.FilePath
 import System.Directory
-import Formatter
+import Utils.Yukari.Formatter
 
 mainpage = "https://yuki.animebytes.tv/"
 
