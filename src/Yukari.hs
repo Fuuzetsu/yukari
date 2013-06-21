@@ -46,12 +46,12 @@ watchDirs cat
   | otherwise = Nothing
 
 
-
+main :: IO ()
 main = do
   args <- getArgs
   progName <- getProgName
   if length args /= 2
-    then putStrLn ("usage: " ++ progName ++ " <username> <password>") >> exitWith $ ExitFailure 1
+    then putStrLn ("usage: " ++ progName ++ " <username> <password>") >> (exitWith $ ExitFailure 1)
     else spendYen $ spendSettings { regularSettings = (regularSettings spendSettings) { username = head args
                                                                                       , password = last args
                                                                                       }

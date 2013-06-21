@@ -14,7 +14,7 @@ import Utils.Yukari.Types
 import Utils.Yukari.Settings
 import Utils.Yukari.Formatter
 import Control.Concurrent
-
+import Control.Arrow ((&&&))
 
 type URL = String
 
@@ -63,7 +63,7 @@ crawl settings curl url = do
   crawl settings curl nextPage
 
 buildTorrentPaths :: SiteSettings -> ABTorrentGroup -> [(Maybe FilePath, URL)]
-buildTorrentPaths set group = map (makePath Control.Arrow.&&& torrentDownloadURI) $ torrents group
+buildTorrentPaths set group = map (makePath &&& torrentDownloadURI) $ torrents group
   where makePath :: ABTorrent -> Maybe FilePath
         makePath tor = foldl (liftA2 (</>)) (topWatch set) [ watchFunc set $ torrentCategory group
                                                            , Just (torrentName group ++ " - " ++
