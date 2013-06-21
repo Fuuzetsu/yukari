@@ -128,7 +128,7 @@ text = getChildren >>> getText
 getCssAttr t attr eq = css t >>> hasAttrValue attr (== eq)
 getTorP = getCssAttr "td" "class"
 
-getTorrent = nameAttr "tr" "class" isInfixOf "torrent  " >>> 
+getTorrent = nameAttr "tr" "class" isInfixOf "torrent  " >>>
       proc x -> do
         tID <- getAttrValue "id" -< x
         tInfSuf <- concat .< (getText <\\ processTopDown (filterA $ neg (hasName "img"))
@@ -147,7 +147,7 @@ getTorrent = nameAttr "tr" "class" isInfixOf "torrent  " >>>
                              }
 
 --extractTorrentGroups :: String -> [ABTorrentGroup]
-extractTorrentGroups doc = doc //> css "div" >>> hasAttrValue "class" (isInfixOf "group_cont") >>> 
+extractTorrentGroups doc = doc //> css "div" >>> hasAttrValue "class" (isInfixOf "group_cont") >>>
       proc x -> do
         cat <- text <<< nameAttr "span" "class" (==) "cat"  -< x
         img <- css "img" ! "src" <<< nAt "mainimg" -< x
@@ -163,12 +163,12 @@ extractTorrentGroups doc = doc //> css "div" >>> hasAttrValue "class" (isInfixOf
                                   , groupID = stripID grID, torrentImageURI = img, torrentTags = map stripeq tags
                                   , torrents = map (\x -> attachInfo x $ parseInfo (parseCategory cat) (torrentInfoSuffix x)) tors
                                   }
-                              
+
 
 parseYenPage :: String -> IO YenPage
 parseYenPage body = do
   let doc = parseHtml body
-  yen <- runX $ doc //> hasAttrValue "href" (== "konbini.php") /> getText
+  yen <- runX $ doc //> hasAttrValue "href" (== "/konbini.php") /> getText
   links <- runX $ (doc //> hasName "a" >>> getAttrValue "href") >>. filter isExchange
   return YenPage { yenOwned = yenToInt $ head yen
                  , spendingLinks = map linksToCostLinks links
@@ -179,7 +179,7 @@ parseYenPage body = do
             | "trade=1" `isInfixOf` x = (1000, x)
             | "trade=2" `isInfixOf` x = (10000, x)
             | "trade=3" `isInfixOf` x = (100000, x)
-            | "trade=4" `isInfixOf` x = (1000000, x) 
+            | "trade=4" `isInfixOf` x = (1000000, x)
 
 
 parseInfo :: Category -> String -> Information
