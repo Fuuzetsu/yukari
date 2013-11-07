@@ -47,6 +47,18 @@ banned s = do
   (_, body) <- curlGetString (loginSite s) []
   return $ "You are banned from logging in for another " `isInfixOf` body
 
+-- | As someone thought that _obviously_ the best way to inform
+-- the user about a failed login would be a JavaScript pop-up, we have to hack
+-- around the braindead defaults.
+--
+-- We try to fetch the index page and if we can see the forums.php in the body,
+-- we probably made it.
+loggedIn :: SiteSettings -> Curl -> IO Bool
+loggedIn s c = do
+  body <- getInternalPage c (baseSite s)
+  return $ "forums.php" `isInfixOf` body
+
+
 logonCurl :: SiteSettings -> IO Curl
 logonCurl s = do
   b <- banned s
@@ -58,7 +70,8 @@ logonCurl s = do
   curl <- initialize
   setopts curl [ CurlCookieJar "cookies", CurlUserAgent defaultUserAgent, CurlTimeout 15 ]
   r <- do_curl_ curl (loginSite s) fields :: IO CurlResponse
-  if respCurlCode r /= CurlOK
+  l <- loggedIn s curl
+  if respCurlCode r /= CurlOK || not l
     then error $ "Failed to log in as " ++ username s ++ ": " ++ show (respCurlCode r) ++ " -- " ++ respStatusLine r
     else return curl
 
