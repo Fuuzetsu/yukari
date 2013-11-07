@@ -61,10 +61,34 @@ usernameP = kvP "username"
 passwordP :: P.Parser String
 passwordP = kvP "password"
 
+logP :: P.Parser Verbosity
+logP = do
+  s <- kvP "logVerbosity"
+  case s of
+    "Quiet" -> return Quiet
+    "Low" -> return Low
+    "High" -> return High
+    o -> fail $ o ++ " is not a valid verbosity level! "
+         ++ "Choose Quiet, Low or High"
+
+boolP :: String -> P.Parser Bool
+boolP s = do
+  b <- kvP s
+  case b of
+    "False" -> return False
+    "True" -> return True
+    o -> fail $ o ++ " is not a valid Bool value. Choose True or False"
+
 configParser :: ConfParser
 configParser = do
   u <- usernameP
   p <- passwordP
+  bs <- kvP "baseSite"
+  ls <- kvP "loginSite"
+  ss <- kvP "searchSite"
+  v <- logP
+  tw <- kvP "topWatch"
+  clobberFiles <- boolP "clobberFiles"
   let st = siteSettings { username = u
                         , password = p
                         }
