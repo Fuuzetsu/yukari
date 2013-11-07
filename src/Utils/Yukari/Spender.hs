@@ -6,9 +6,9 @@ import Utils.Yukari.Parser (parseYenPage)
 import Utils.Yukari.Types
 import Control.Monad
 
-spendYen :: SpendSettings -> IO ()
-spendYen ys = do
-  let rs = regularSettings ys
+spendYen :: SiteSettings -> SpendSettings -> IO ()
+spendYen regularSettings ys = do
+  let rs = regularSettings
   let v = logVerbosity rs
   page <- parseYenPage =<< getSinglePage rs (yenSite ys)
   when (v >= Low) (putStrLn $ "Currently have " ++ show (yenOwned page) ++ " yen.")
@@ -18,8 +18,8 @@ spendYen ys = do
     Just (cost, link) -> do
       when (v >= Low) (putStrLn $ "Spending " ++ show cost ++ " yen.")
       when (v >= High) (putStrLn $ "Spending the yen at " ++ link)
-      getSinglePage (regularSettings ys) link >> spendYen ys
-  where attachBase yp = yp { spendingLinks = map (\(c, l) -> (,) c (baseSite (regularSettings ys) ++ "/" ++ l)) (spendingLinks yp)}
+      getSinglePage (regularSettings) link >> spendYen regularSettings ys
+  where attachBase yp = yp { spendingLinks = map (\(c, l) -> (,) c (baseSite regularSettings ++ "/" ++ l)) (spendingLinks yp)}
 
 chooseOptimal :: SpendSettings -> YenPage -> Maybe (Cost, String)
 chooseOptimal ys yp = let l = filterUnwanted ys yp in if null l then Nothing else Just $ foldl (\x@(c, q) y@(d, w) -> if c >= d then x else y) (head l) (tail l)

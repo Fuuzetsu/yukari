@@ -17,8 +17,7 @@ data SiteSettings = SiteSettings { username :: String
                                  , clobberFiles :: Bool
                                  }
 
-data SpendSettings = SpendSettings { regularSettings :: SiteSettings
-                                   , yenSite :: String
+data SpendSettings = SpendSettings { yenSite :: String
                                    , yenLeftOver :: Integer
                                    }
 
