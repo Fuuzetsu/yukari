@@ -28,7 +28,8 @@ cabal-version:       >=1.8
 
 executable yukari
   -- .hs or .lhs file containing the Main module.
-  main-is:             Yukari.hs
+  -- main-is:             Utils/Yukari.hs
+  main-is:             Main.hs
 
   -- Modules included in this executable, other than Main.
   -- other-modules:
@@ -51,6 +52,7 @@ library
 
   hs-source-dirs:       src
   exposed-modules:
+    Utils.Yukari
     Utils.Yukari.Types
     Utils.Yukari.Settings
 
