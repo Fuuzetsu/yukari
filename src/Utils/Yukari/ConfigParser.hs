@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Utils.Yukari.ConfigParser (parseConfig) where
+module Utils.Yukari.ConfigParser where
 
 import Control.Applicative
 import Debug.Trace
@@ -53,12 +53,18 @@ torrentFilter tor = all (`id` tor) filters
 kvP :: String -> P.Parser String
 kvP s = T.unpack <$> (P.string (T.pack s) *> P.takeWhile (/= '\n') <* "\n")
 
+usernameP :: P.Parser String
+usernameP = kvP "username"
+
+passwordP :: P.Parser String
+passwordP = kvP "password"
+
 configParser :: ConfParser
 configParser = do
   u <- kvP "username"
   p <- kvP "password"
-  let st = siteSettings { username = trace ("username: " ++ u) u
-                        , password = trace ("password: " ++ p) p
+  let st = siteSettings { username = u
+                        , password = p
                         }
   return (spendSettings, st)
 
