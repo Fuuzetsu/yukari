@@ -51,7 +51,8 @@ torrentFilter tor = all (`id` tor) filters
                                     ]
 
 kvP :: String -> P.Parser String
-kvP s = T.unpack <$> (P.string (T.pack s) *> P.takeWhile (/= '\n') <* "\n")
+kvP s = T.unpack <$> (P.string (T.pack $ s ++ " = ")
+                      *> P.takeWhile (/= '\n') <* "\n")
 
 usernameP :: P.Parser String
 usernameP = kvP "username"
