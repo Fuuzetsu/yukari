@@ -9,7 +9,7 @@ import Control.Monad
 import Control.Applicative
 import qualified Data.ByteString as BS
 
-import Utils.Yukari.Parser
+import Utils.Yukari.Parser (parsePage, parseYenPage)
 import Utils.Yukari.Types
 import Utils.Yukari.Settings
 import Utils.Yukari.Formatter
@@ -88,7 +88,7 @@ getSinglePage settings url = logonCurl settings >>= flip getInternalPage url
 
 
 download :: Maybe FilePath -> String -> Verbosity -> Bool -> IO ()
-download path url verb clobber = 
+download path url verb clobber =
   case path of
     Nothing -> when (verb >= Low) (putStrLn "Skipping empty path.")
     Just p -> do
