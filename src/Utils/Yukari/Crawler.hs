@@ -1,20 +1,21 @@
 module Utils.Yukari.Crawler (crawlFromURL, crawlFromFile, getSinglePage) where
 
-import Network.Curl
-import Network.Curl.Download
-import Network.HTTP hiding (password)
-import System.FilePath
-import System.Directory
-import Control.Monad
-import Control.Applicative
+import           Control.Applicative
+import           Control.Arrow ((&&&))
+import           Control.Concurrent
+import           Control.Monad
 import qualified Data.ByteString as BS
-
-import Utils.Yukari.Parser (parsePage, parseYenPage)
-import Utils.Yukari.Types
-import Utils.Yukari.Settings
-import Utils.Yukari.Formatter
-import Control.Concurrent
-import Control.Arrow ((&&&))
+import           Data.List
+import           Network.Curl
+import           Network.Curl.Download
+import           Network.HTTP hiding (password)
+import           System.Directory
+import           System.Exit
+import           System.FilePath
+import           Utils.Yukari.Formatter
+import           Utils.Yukari.Parser (parsePage, parseYenPage)
+import           Utils.Yukari.Settings
+import           Utils.Yukari.Types
 
 type URL = String
 
@@ -46,13 +47,18 @@ logonCurl s = do
   r <- do_curl_ curl (loginSite s) fields :: IO CurlResponse
   if respCurlCode r /= CurlOK
     then error $ "Failed to log in as " ++ username s ++ ": " ++ show (respCurlCode r) ++ " -- " ++ respStatusLine r
-    else return curl
+    else if ("You are banned from logging in for another " `isInfixOf` respBody r)
+         then do
+           putStrLn "You have been banned from logging in. Check the site."
+           exitFailure
+         else return curl
 
 crawl :: SiteSettings -> Curl -> String -> IO ()
 crawl _ _ "" = return ()
 crawl settings curl url = do
   when (logVerbosity settings >= Low) (putStrLn $ "Crawling " ++ url)
   body <- getInternalPage curl url
+
   pa@(nextPage, groups) <- parsePage body
   when (logVerbosity settings >= High) (prettyPage pa)
   when (logVerbosity settings >= Low) (putStrLn $ "Have " ++ show (sum (map (length . torrents) groups)) ++ " torrents pre-filter.")
