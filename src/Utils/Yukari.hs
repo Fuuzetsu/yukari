@@ -9,41 +9,30 @@ import           System.Directory
 import           System.Environment
 import           System.Exit
 import           System.FilePath
-import           Utils.Yukari.ConfigParser (parseConfig)
 import           Utils.Yukari.Crawler
 import           Utils.Yukari.Filters
 import           Utils.Yukari.Settings
 import           Utils.Yukari.Spender
 import           Utils.Yukari.Types
 
-readConfig :: IO (Either String (SpendSettings, SiteSettings))
-readConfig = do
-  configPath <- configFile
-  t <- doesFileExist configPath
-  if t
-    then do
-      c <- readFile configPath
-      return $ parseConfig c
-    else return $ Left ("The " ++ configPath ++ " config doesn't exist!")
-  where
-    configFile :: IO FilePath
-    configFile = liftM (</> ".yukari") getHomeDirectory
-
 showError :: Maybe YukariSettings -> String -> Maybe YukariSettings
 showError = const
 
-dyreParams = Dyre.wrapMain $ Dyre.defaultParams
+dps = Dyre.defaultParams
   { Dyre.projectName = "Yukari"
   , Dyre.realMain = realMain
   , Dyre.showError = showError
+  , Dyre.configCheck = True
   , Dyre.configDir = Just $ do hd <- getHomeDirectory
                                return $ hd </> ".yukari"
   }
 
+dyreParams = Dyre.wrapMain dps
+
 
 realMain :: Maybe YukariSettings -> IO ()
 realMain Nothing = do
-  putStrLn "Got Nothing as settings!"
+  putStrLn "Got Nothing as settings. This is bad."
   exitFailure
 realMain (Just (YukariSettings site spend)) = do
   args <- getArgs
@@ -51,7 +40,6 @@ realMain (Just (YukariSettings site spend)) = do
     putStrLn $ "This program currently takes no arguments. "
       ++ "Populate your ~/.yukari/Yukari.hs instead"
     exitFailure
-  -- progName <- getProgName
   spendYen site spend
 
  -- crawlFromURL $ searchSettings

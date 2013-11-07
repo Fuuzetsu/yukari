@@ -53,8 +53,13 @@ library
   hs-source-dirs:       src
   exposed-modules:
     Utils.Yukari
-    Utils.Yukari.Types
+    Utils.Yukari.Crawler
+    Utils.Yukari.Filters
+    Utils.Yukari.Formatter
+    Utils.Yukari.Parser
     Utils.Yukari.Settings
+    Utils.Yukari.Spender
+    Utils.Yukari.Types
 
 test-suite spec
   type:             exitcode-stdio-1.0
