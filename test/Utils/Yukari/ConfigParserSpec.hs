@@ -18,8 +18,16 @@ spec = do
     it "can parse out the username" $ do
       parseField username usernameP configFile `shouldBe` Right "foo"
 
+    it "fails properly when it can't parse the username field" $ do
+      parseField username usernameP  "invalidfield = foo\n"
+        `shouldBe` Left "Failed to parse the username field in the config file."
+
     it "can parse out the password" $ do
       parseField password passwordP configFile `shouldBe` Right "bar"
+
+    it "fails properly when it can't parse the password field" $ do
+      parseField password passwordP  "username = bar\ninvalidfield = foo\n"
+        `shouldBe` Left "Failed to parse the password field in the config file."
 
 
 parseField :: (SiteSettings -> a) -> Parser a -> String -> Either String a
