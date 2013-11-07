@@ -7,3 +7,5 @@ cabal-dev
 .virthualenv
 /cookies
 /test.htm
+.cabal-sandbox/
+cabal.sandbox.config
