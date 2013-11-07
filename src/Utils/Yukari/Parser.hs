@@ -1,17 +1,17 @@
-{-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
+{-# LANGUAGE Arrows, NoMonomorphismRestriction, OverloadedStrings #-}
 
 module Utils.Yukari.Parser (parsePage, parseYenPage) where
 
-import Utils.Yukari.Types
-import Text.XML.HXT.Core
-import Text.HandsomeSoup
-import Data.List
-import Data.Char
-
-import Data.Text (pack, unpack, split)
-import System.FilePath
-import System.Directory
-import Utils.Yukari.Formatter
+import qualified Data.Attoparsec.Text as A
+import           Data.Char
+import           Data.List
+import           Data.Text (pack, unpack, split)
+import           System.Directory
+import           System.FilePath
+import           Text.HandsomeSoup
+import           Text.XML.HXT.Core
+import           Utils.Yukari.Formatter
+import           Utils.Yukari.Types
 
 mainpage = "https://yuki.animebytes.tv/"
 
@@ -147,23 +147,50 @@ getTorrent = nameAttr "tr" "class" isInfixOf "torrent  " >>>
                              }
 
 --extractTorrentGroups :: String -> [ABTorrentGroup]
-extractTorrentGroups doc = doc //> css "div" >>> hasAttrValue "class" (isInfixOf "group_cont") >>>
-      proc x -> do
-        cat <- text <<< nameAttr "span" "class" (==) "cat"  -< x
-        img <- css "img" ! "src" <<< nAt "mainimg" -< x
-        serID <- getAttrValue "href" <<< hasAttrValue "href" (isInfixOf "series.php")
-                 <<< css "a" <<< gTit-< x
-        grID <- getAttrValue "href" <<< hasAttrValue "href" (isInfixOf "torrents.php")
-                <<< css "a" <<< gTit -< x
-        title <- getText <<< getChildren <<< hasAttrValue "href" (isInfixOf "series.php")
-                 <<< css "a" <<< gTit -< x
-        tags <- listA $ css "a" ! "href" <<< hasAttrValue "class" (== "tags_sm") <<< multi (hasName "div") -< x
-        tors <- listA getTorrent <<< hasAttrValue "class" (== "torrent_group") <<< multi (hasName "table") -< x
-        returnA -< ABTorrentGroup { torrentName = title, torrentCategory = parseCategory cat, seriesID = stripID serID
-                                  , groupID = stripID grID, torrentImageURI = img, torrentTags = map stripeq tags
-                                  , torrents = map (\x -> attachInfo x $ parseInfo (parseCategory cat) (torrentInfoSuffix x)) tors
-                                  }
+extractTorrentGroups doc = doc //> css "div" >>> havp "class" "group_cont" >>>
+  proc x -> do
+    cat <- text <<< nameAttr "span" "class" (==) "cat"  -< x
+    img <- css "img" ! "src" <<< nAt "mainimg" -< x
+    serID <- getAttrValue "href" <<< havp "href" "series.php"
+             <<< css "a" <<< gTit-< x
+    grID <- getAttrValue "href" <<< havp "href" "torrents.php"
+            <<< css "a" <<< gTit -< x
+    title <- getText <<< getChildren <<< havpa "series"
+             <<< css "a" <<< gTit -< x
+    tags <- listA $ css "a" ! "href" <<< hasAttrValue "class" (== "tags_sm")
+            <<< multi (hasName "div") -< x
+    tors <- listA getTorrent <<< hasAttrValue "class" (== "torrent_group") <<< multi (hasName "table") -< x
+    returnA -< ABTorrentGroup { torrentName = title, torrentCategory = parseCategory cat, seriesID = stripID serID
+                              , groupID = stripID grID, torrentImageURI = img, torrentTags = map stripeq tags
+                              , torrents = map (\x -> attachInfo x $ parseInfo (parseCategory cat) (torrentInfoSuffix x)) tors
+                              }
+  where
+    havp atr content = hasAttrValue atr $ isInfixOf content
+    havpa page = havp "href" (page ++ ".php") <<< css "a" <<< gTit
 
+
+parseInfo :: Category -> String -> Information
+parseInfo Anime suf = parseAnimeInfo suf
+parseInfo (Manga _) suf = parseMangaInfo suf
+parseInfo cat suf = NoInfo
+
+attachInfo :: ABTorrent -> Information -> ABTorrent
+attachInfo t i = t {torrentInfo = i}
+
+extractNextPage doc = doc /> css "div" >>> hasAttrValue "class" (== "pages")
+                      >>> css "a" >>> proc elem -> do
+  text <- deep getText -< elem
+  if "Next" `isInfixOf` text
+    then getAttrValue "href" -< elem
+    else zeroArrow -< ()
+
+parsePage :: String -> IO (String, [ABTorrentGroup])
+parsePage html = do
+  let doc = parseHtml html
+  n <- runX $ extractNextPage doc
+  gs <- runX $ extractTorrentGroups doc
+  let next = if null n then "" else mainpage ++ head n
+  return (next, gs)
 
 parseYenPage :: String -> IO YenPage
 parseYenPage body = do
@@ -180,32 +207,6 @@ parseYenPage body = do
             | "trade=2" `isInfixOf` x = (10000, x)
             | "trade=3" `isInfixOf` x = (100000, x)
             | "trade=4" `isInfixOf` x = (1000000, x)
-
-
-parseInfo :: Category -> String -> Information
-parseInfo Anime suf = parseAnimeInfo suf
-parseInfo (Manga _) suf = parseMangaInfo suf
-parseInfo cat suf = NoInfo
-
-attachInfo :: ABTorrent -> Information -> ABTorrent
-attachInfo t i = t {torrentInfo = i}
-
-extractNextPage doc = doc /> css "div" >>> hasAttrValue "class" (== "pages") >>>
-                      css "a" >>>
-  proc elem -> do
-    text <- deep getText -< elem
-    if "Next" `isInfixOf` text
-      then getAttrValue "href" -< elem
-      else zeroArrow -< ()
-
-parsePage :: String -> IO (String, [ABTorrentGroup])
-parsePage html = do
-  let doc = parseHtml html
-  n <- runX $ extractNextPage doc
-  gs <- runX $ extractTorrentGroups doc
-  let next = if null n then "" else mainpage ++ head n
-  return (next, gs)
-
 
 parseCategory :: String -> Category
 parseCategory cat
