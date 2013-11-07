@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Utils.Yukari.ConfigParser (parseConfig) where
+module Utils.Yukari.ConfigParser where
 
-import Control.Applicative
-import Debug.Trace
+import           Control.Applicative
+import           Data.List
 import qualified Data.Attoparsec.Text as P
 import qualified Data.Text as T
 import           System.Directory
@@ -51,16 +51,28 @@ torrentFilter tor = all (`id` tor) filters
                                     ]
 
 kvP :: String -> P.Parser String
-kvP s = T.unpack <$> (P.string (T.pack s) *> P.takeWhile (/= '\n') <* "\n")
+kvP s = T.unpack <$> (P.string (T.pack $ s ++ " = ")
+                       *> P.takeWhile (/= '\n') <* "\n")
+        <|> fail ("Failed to parse the " ++ s ++ " field in the config file.")
+
+usernameP :: P.Parser String
+usernameP = kvP "username"
+
+passwordP :: P.Parser String
+passwordP = kvP "password"
 
 configParser :: ConfParser
 configParser = do
-  u <- kvP "username"
-  p <- kvP "password"
-  let st = siteSettings { username = trace ("username: " ++ u) u
-                        , password = trace ("password: " ++ p) p
+  u <- usernameP
+  p <- passwordP
+  let st = siteSettings { username = u
+                        , password = p
                         }
   return (spendSettings, st)
 
 parseConfig :: String -> Either String (SpendSettings, SiteSettings)
-parseConfig s = P.parseOnly configParser (T.pack s)
+parseConfig s = case P.parseOnly configParser (T.pack s) of
+  Left err -> if "Failed reading: " `isPrefixOf` err
+              then Left $ drop (length ("Failed reading: " :: String)) err
+              else Left err
+  r -> r
