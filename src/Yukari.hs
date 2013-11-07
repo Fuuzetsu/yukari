@@ -42,7 +42,8 @@ watchDirs cat
   | cat == VisualNovel = Just "watchvnovels"
   | cat `elem` map Music [Single, Soundtrack, MusicDVD, Live, PV, LiveAlbum
                          , Compilation, Album, DramaCD] = Just "watchmusic"
-  | cat `elem` map Manga [GenericManga, Oneshot, Manhua, Manhwa, OEL] = Just "watchmanga"
+  | cat `elem` map Manga [GenericManga, Oneshot
+                         , Manhua, Manhwa, OEL] = Just "watchmanga"
   | otherwise = Nothing
 
 
