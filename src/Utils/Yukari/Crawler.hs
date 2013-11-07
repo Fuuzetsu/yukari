@@ -39,19 +39,28 @@ getInternalPage curl url = do
     then error $ "Failed to fetch: " ++ url ++ " ; " ++ show (respCurlCode r) ++ " -- " ++ respStatusLine r
     else return $ respBody r
 
+-- | We check if we're banned first before we even try to log in.
+-- While it is an extra GET, we don't POST account information needlessly
+-- and this is only done once per log in anyway.
+banned :: SiteSettings -> IO Bool
+banned s = do
+  (_, body) <- curlGetString (loginSite s) []
+  return $ "You are banned from logging in for another " `isInfixOf` body
+
 logonCurl :: SiteSettings -> IO Curl
 logonCurl s = do
+  b <- banned s
+  when b $ do
+    putStrLn "You have been banned from logging in. Check the site."
+    exitFailure
+
   let fields = CurlPostFields [ "username=" ++ username s, "password=" ++ password s ] : method_POST
   curl <- initialize
   setopts curl [ CurlCookieJar "cookies", CurlUserAgent defaultUserAgent, CurlTimeout 15 ]
   r <- do_curl_ curl (loginSite s) fields :: IO CurlResponse
   if respCurlCode r /= CurlOK
     then error $ "Failed to log in as " ++ username s ++ ": " ++ show (respCurlCode r) ++ " -- " ++ respStatusLine r
-    else if ("You are banned from logging in for another " `isInfixOf` respBody r)
-         then do
-           putStrLn "You have been banned from logging in. Check the site."
-           exitFailure
-         else return curl
+    else return curl
 
 crawl :: SiteSettings -> Curl -> String -> IO ()
 crawl _ _ "" = return ()
