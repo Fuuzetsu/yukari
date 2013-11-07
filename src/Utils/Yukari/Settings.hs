@@ -5,6 +5,8 @@ import System.FilePath
 import Data.Maybe
 
 
+data YukariSettings = YukariSettings SiteSettings SpendSettings
+
 data SiteSettings = SiteSettings { username :: String
                                  , password :: String
                                  , baseSite :: String

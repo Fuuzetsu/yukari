@@ -28,7 +28,8 @@ cabal-version:       >=1.8
 
 executable yukari
   -- .hs or .lhs file containing the Main module.
-  main-is:             Yukari.hs
+  -- main-is:             Utils/Yukari.hs
+  main-is:             Main.hs
 
   -- Modules included in this executable, other than Main.
   -- other-modules:
@@ -36,10 +37,29 @@ executable yukari
   build-depends:       base ==4.*, curl ==1.3.*, HTTP ==4000.*, filepath ==1.3.*
                        , directory ==1.2.*, bytestring ==0.10.*, network ==2.4.*
                        , text ==0.11.*, attoparsec ==0.10.*, HandsomeSoup ==0.3.*
-                       , hxt ==9.*, download-curl ==0.1.*
+                       , hxt ==9.*, download-curl ==0.1.*, dyre
 
   -- Directories containing source files.
   hs-source-dirs:      src
+
+library
+  default-language:     Haskell2010
+
+  build-depends:       base ==4.*, curl ==1.3.*, HTTP ==4000.*, filepath ==1.3.*
+                       , directory ==1.2.*, bytestring ==0.10.*, network ==2.4.*
+                       , text ==0.11.*, attoparsec ==0.10.*, HandsomeSoup ==0.3.*
+                       , hxt ==9.*, download-curl ==0.1.*, dyre
+
+  hs-source-dirs:       src
+  exposed-modules:
+    Utils.Yukari
+    Utils.Yukari.Crawler
+    Utils.Yukari.Filters
+    Utils.Yukari.Formatter
+    Utils.Yukari.Parser
+    Utils.Yukari.Settings
+    Utils.Yukari.Spender
+    Utils.Yukari.Types
 
 test-suite spec
   type:             exitcode-stdio-1.0
@@ -55,4 +75,4 @@ test-suite spec
   build-depends:       base ==4.*, curl ==1.3.*, HTTP ==4000.*, filepath ==1.3.*
                        , directory ==1.2.*, bytestring ==0.10.*, network ==2.4.*
                        , text ==0.11.*, attoparsec ==0.10.*, HandsomeSoup ==0.3.*
-                       , hxt ==9.*, download-curl ==0.1.*, hspec , QuickCheck == 2.*
+                       , hxt ==9.*, download-curl ==0.1.*, hspec , QuickCheck == 2.*, dyre
