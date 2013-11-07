@@ -37,8 +37,7 @@ main = do
   progName <- getProgName
   c <- readConfig
   case c of
-    Left e -> putStrLn $ "Error: " ++ e
-    Right (spendS, _) -> spendYen spendS
- --spendSettings { regularSettings = (regularSettings spendSettings) { username = head args , password = last args }
+    Left e -> putStrLn ("Error: " ++ e) >> exitFailure
+    Right (spendS, siteS) -> spendYen siteS spendS
  -- crawlFromURL $ searchSettings
  -- spendYen spendSettings
