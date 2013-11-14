@@ -29,7 +29,7 @@ data SpendSettings = SpendSettings { yenSite :: String
 data ProgramSettings = DryRun | SpendYen | DownloadTorrents
                      deriving (Show, Eq)
 
-data Verbosity = Quiet | Low | High
+data Verbosity = Quiet | Low | High | Debug
                deriving (Show, Eq, Ord)
 
 minimalSettings :: String -> String -> String -> SiteSettings

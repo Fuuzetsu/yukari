@@ -56,26 +56,38 @@ banned s = do
 --
 -- We try to fetch the index page and if we can see the forums.php in the body,
 -- we probably made it.
-loggedIn :: SiteSettings -> Curl -> IO Bool
+loggedIn :: YukariSettings -> Curl -> IO Bool
 loggedIn s c = do
-  body <- getInternalPage c (baseSite s)
+  let settings = siteSettings s
+  body <- getInternalPage c (baseSite settings)
+  let b = "forums.php" `isInfixOf` body
+  unless b $ verbPrint Debug s [ "Failed to log in. username:"
+                               , username settings
+                               , "password:"
+                               , password settings
+                                 ++ "\nBody:\n" ++ body
+                               ]
   return $ "forums.php" `isInfixOf` body
 
 -- | Log in to the site.
-logonCurl :: SiteSettings -> IO Curl
-logonCurl s = do
+logonCurl :: YukariSettings -> IO Curl
+logonCurl ys = do
+  let s = siteSettings ys
   b <- banned s
   when b $ do
-    putStrLn "You have been banned from logging in. Check the site."
+    putStrLn "Seems you have been banned from logging in. Check the site."
     exitFailure
 
-  let fields = CurlPostFields [ "username=" ++ username s, "password=" ++ password s ] : method_POST
+  let fields = CurlPostFields [ "username=" ++ username s
+                              , "password=" ++ password s ] : method_POST
   curl <- initialize
-  setopts curl [ CurlCookieJar "cookies", CurlUserAgent defaultUserAgent, CurlTimeout 15 ]
+  setopts curl [ CurlCookieJar "cookies", CurlUserAgent defaultUserAgent
+               , CurlTimeout 15 ]
   r <- do_curl_ curl (loginSite s) fields :: IO CurlResponse
-  l <- loggedIn s curl
+  l <- loggedIn ys curl
   if respCurlCode r /= CurlOK || not l
-    then error $ "Failed to log in as " ++ username s ++ ": " ++ show (respCurlCode r) ++ " -- " ++ respStatusLine r
+    then error $ concat ["Failed to log in as ", username s, ": "
+                        , show $ respCurlCode r, " -- ", respStatusLine r]
     else return curl
 
 -- | Crawl the page according to user settings and using a specified curl
@@ -118,7 +130,7 @@ buildTorrentPaths set group =
 crawlFromFile :: YukariSettings -> FilePath -> IO ()
 crawlFromFile ys f = do
   let settings = siteSettings ys
-  curl <- logonCurl settings
+  curl <- logonCurl ys
   body <- readFile f
   (n, _) <- parsePage body
   crawl ys curl n
@@ -127,13 +139,13 @@ crawlFromFile ys f = do
 crawlFromURL :: YukariSettings -> IO ()
 crawlFromURL ys = do
   let settings = siteSettings ys
-  curl <- logonCurl settings
+  curl <- logonCurl ys
   crawl ys curl $ searchSite settings
 
 -- | Logs the user in with 'logonCurl' and fetches a single page using
 -- 'getInternalPage'. Useful when we just want to grab something quickly.
-getSinglePage :: SiteSettings -> String -> IO String
-getSinglePage settings url = logonCurl settings >>= flip getInternalPage url
+getSinglePage :: YukariSettings -> String -> IO String
+getSinglePage ys url = logonCurl ys >>= flip getInternalPage url
 
 -- | Downloads a file to the specified location. If the file path is Nothing,
 -- the download isn't performed.

@@ -12,7 +12,7 @@ import Control.Monad
 spendYen :: YukariSettings -> IO ()
 spendYen ys = do
   let rs = siteSettings ys
-  page <- parseYenPage =<< getSinglePage rs (yenSite $ spendSettings ys)
+  page <- parseYenPage =<< getSinglePage ys (yenSite $ spendSettings ys)
   verbPrint Low ys ["Currently have", show $ yenOwned page, "yen."]
   verbPrint High ys ["Leftover yen limit set to"
                     , show . yenLeftOver $ spendSettings ys]
@@ -22,7 +22,7 @@ spendYen ys = do
     Just (cost, link) -> do
       verbPrint Low ys ["Spending", show cost, "yen."]
       verbPrint High ys ["Spending the yen at", link]
-      getSinglePage rs link >> spendYen ys
+      getSinglePage ys link >> spendYen ys
   where
     -- Attach the partial links we get from the site with
     -- the full link of the base site, adding the ‘/’ separator
