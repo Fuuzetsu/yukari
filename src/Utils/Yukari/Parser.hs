@@ -11,9 +11,8 @@ import           System.FilePath
 import           Text.HandsomeSoup
 import           Text.XML.HXT.Core
 import           Utils.Yukari.Formatter
+import           Utils.Yukari.Settings
 import           Utils.Yukari.Types
-
-mainpage = "https://yuki.animebytes.tv/"
 
 parseAnimeInfo :: String -> Information
 parseAnimeInfo info = AnimeInformation AnimeInfo { releaseFormat = parseFormat info
@@ -128,7 +127,9 @@ text = getChildren >>> getText
 getCssAttr t attr eq = css t >>> hasAttrValue attr (== eq)
 getTorP = getCssAttr "td" "class"
 
-getTorrent = nameAttr "tr" "class" isInfixOf "torrent  " >>>
+getTorrent ys =
+  let mainpage = baseSite $ siteSettings ys
+  in nameAttr "tr" "class" isInfixOf "torrent  " >>>
       proc x -> do
         tID <- getAttrValue "id" -< x
         tInfSuf <- concat .< (getText <\\ processTopDown (filterA $ neg (hasName "img"))
@@ -147,7 +148,7 @@ getTorrent = nameAttr "tr" "class" isInfixOf "torrent  " >>>
                              }
 
 --extractTorrentGroups :: String -> [ABTorrentGroup]
-extractTorrentGroups doc = doc //> css "div" >>> havp "class" "group_cont" >>>
+extractTorrentGroups doc ys = doc //> css "div" >>> havp "class" "group_cont" >>>
   proc x -> do
     cat <- text <<< nameAttr "span" "class" (==) "cat"  -< x
     img <- css "img" ! "src" <<< nAt "mainimg" -< x
@@ -159,7 +160,7 @@ extractTorrentGroups doc = doc //> css "div" >>> havp "class" "group_cont" >>>
              <<< css "a" <<< gTit -< x
     tags <- listA $ css "a" ! "href" <<< hasAttrValue "class" (== "tags_sm")
             <<< multi (hasName "div") -< x
-    tors <- listA getTorrent <<< hasAttrValue "class" (== "torrent_group") <<< multi (hasName "table") -< x
+    tors <- listA (getTorrent ys) <<< hasAttrValue "class" (== "torrent_group") <<< multi (hasName "table") -< x
     returnA -< ABTorrentGroup { torrentName = title, torrentCategory = parseCategory cat, seriesID = stripID serID
                               , groupID = stripID grID, torrentImageURI = img, torrentTags = map stripeq tags
                               , torrents = map (\x -> attachInfo x $ parseInfo (parseCategory cat) (torrentInfoSuffix x)) tors
@@ -184,12 +185,13 @@ extractNextPage doc = doc /> css "div" >>> hasAttrValue "class" (== "pages")
     then getAttrValue "href" -< elem
     else zeroArrow -< ()
 
-parsePage :: String -> IO (String, [ABTorrentGroup])
-parsePage html = do
+parsePage :: YukariSettings -> String -> IO (String, [ABTorrentGroup])
+parsePage ys html = do
   let doc = parseHtml html
+      site = baseSite $ siteSettings ys
   n <- runX $ extractNextPage doc
-  gs <- runX $ extractTorrentGroups doc
-  let next = if null n then "" else mainpage ++ head n
+  gs <- runX $ extractTorrentGroups doc ys
+  let next = if null n then "" else site ++ "/" ++ head n
   return (next, gs)
 
 parseYenPage :: String -> IO YenPage

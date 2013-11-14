@@ -99,7 +99,8 @@ crawl ys curl url = do
   verbPrint Low ys ["Crawling", url]
   body <- getInternalPage curl url
 
-  pa@(nextPage, groups) <- parsePage body
+  verbPrint Debug ys ["\n" ++ body]
+  pa@(nextPage, groups) <- parsePage ys body
   when (logVerbosity ys >= High) (prettyPage pa)
   verbPrint Low ys ["Have", show . sum $ map (length . torrents) groups
                    , "torrents pre-filter."]
@@ -132,7 +133,7 @@ crawlFromFile ys f = do
   let settings = siteSettings ys
   curl <- logonCurl ys
   body <- readFile f
-  (n, _) <- parsePage body
+  (n, _) <- parsePage ys body
   crawl ys curl n
 
 -- | Starts the crawl from the URL specified in the settings.
