@@ -1,1 +1,10 @@
 language: haskell
+notifications:
+  email:
+    recipients:
+      - fuuzetsu@fuuzetsu.co.uk
+    on_success: never
+    on_failure: change
+  # irc:
+  #   channels:
+  #     - "irc.freenode.net#fuuzetsu"
