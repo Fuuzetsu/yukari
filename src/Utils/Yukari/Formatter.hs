@@ -1,7 +1,6 @@
 module Utils.Yukari.Formatter where
 
 import Control.Monad (when)
-import Data.List (intersperse)
 import Utils.Yukari.Types
 import Utils.Yukari.Settings
 
@@ -18,6 +17,7 @@ prettyTorrent :: ABTorrent -> String
 prettyTorrent t = torrentInfoSuffix t ++ "\tSize: " ++ show (torrentSize t) ++ "\tSeeders: " ++ show (torrentSeeders t)
                   ++ "\nLink: " ++ torrentURI t ++ "\nDownload: " ++ torrentDownloadURI t ++ "\n" ++ prettyInfo (torrentInfo t)
 
+prettyResolution :: Resolution -> [Char]
 prettyResolution (Resolution w h) = show w ++ " x " ++ show h
 
 prettyInfo :: Information -> String
@@ -33,13 +33,14 @@ prettyInfo i = case i of
                                                      , "Archived: " ++ boolYesNo (archived mi)
                                                      , "Ongoing: " ++ boolYesNo (ongoing mi)
                                                      ]
-
-boolYesNo b = if b then "Yes" else "No"
+               where
+                 boolYesNo b = if b then "Yes" else "No"
 
 prettySub :: Subtitles -> String
 prettySub (Softsub x) = "Softsubbed by " ++ x
 prettySub (Hardsub x) = "Hardsubbed by " ++ x
 prettySub RAW = "None"
+prettySub UnknownSubs = "Unknown"
 
 prettyPage :: (String, [ABTorrentGroup]) -> IO ()
 prettyPage = mapM_ (putStrLn . prettyGroup) . snd

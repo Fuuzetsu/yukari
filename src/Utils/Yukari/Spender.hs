@@ -1,17 +1,14 @@
 module Utils.Yukari.Spender (spendYen) where
 
 import Control.Arrow (second)
-import Data.List (intersperse)
 import Utils.Yukari.Settings
 import Utils.Yukari.Crawler (getSinglePage)
 import Utils.Yukari.Formatter
 import Utils.Yukari.Parser (parseYenPage)
 import Utils.Yukari.Types
-import Control.Monad
 
 spendYen :: YukariSettings -> IO ()
 spendYen ys = do
-  let rs = siteSettings ys
   body <- getSinglePage ys (yenSite $ spendSettings ys)
   case body of
     Nothing -> putStrLn $ "Failed to fetch " ++ yenSite (spendSettings ys)
@@ -40,7 +37,7 @@ chooseOptimal :: SpendSettings -> YenPage -> Maybe (Cost, String)
 chooseOptimal ys yp = let l = filterUnwanted ys yp
                       in case l of
                         [] -> Nothing
-                        _ -> Just $ foldl1 (\x@(c, q) y@(d, w) -> if c >= d
+                        _ -> Just $ foldl1 (\x@(c, _) y@(d, _) -> if c >= d
                                                                   then x
                                                                   else y) l
   where

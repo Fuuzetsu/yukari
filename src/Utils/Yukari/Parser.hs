@@ -2,15 +2,13 @@
 
 module Utils.Yukari.Parser (parsePage, parseYenPage) where
 
-import qualified Data.Attoparsec.Text as A
+-- import qualified Data.Attoparsec.Text as A
 import           Data.Char
 import           Data.List
 import           Data.Text (pack, unpack, split)
-import           System.Directory
-import           System.FilePath
+import           Data.Tree.NTree.TypeDefs
 import           Text.HandsomeSoup
 import           Text.XML.HXT.Core
-import           Utils.Yukari.Formatter
 import           Utils.Yukari.Settings
 import           Utils.Yukari.Types
 
@@ -65,6 +63,7 @@ parseSubs info
   | "RAW" `isInfixOf` sub = RAW
   | "Softsubs" `isInfixOf` sub = Softsub $ extractParens sub
   | "Hardsubs" `isInfixOf` sub = Softsub $ extractParens sub
+  | otherwise = UnknownSubs
   where sub = extractSubs info
         extractParens x = if '(' `elem` x then init $ tail $ dropWhile (/= '(') x else ""
 
@@ -79,9 +78,9 @@ splitsize s = ((read $ head as) :: Double, head $ tail as)
     where as = map unpack $ split (== ' ') (pack s)
 
 sizeToBytes :: String -> Integer
-sizeToBytes size = round $ s * 1024 ^ getExp m
+sizeToBytes size = round $ s * 1024 ^ (getExp m :: Integer)
                     where (s, m) = splitsize $ delete ',' size
-                          getExp m = fst $ head $ filter (\(e, u) -> m == u) (zip [0, 1..] ["B", "KB", "MB", "GB", "TB", "PB"])
+                          getExp n = fst $ head $ filter (\(_, u) -> n == u) (zip [0, 1..] ["B", "KB", "MB", "GB", "TB", "PB"])
 
 
 stripeg :: Char -> String -> String
@@ -111,22 +110,44 @@ dropSpaces " " = ""
 dropSpaces s = let x = if head s == ' ' then tail s else s in
                if last x == ' ' then init x else x
 
+procSuff :: String -> String
 procSuff suff = if " | " `isPrefixOf` reverse suff then reverse $ drop 3 $ reverse suff else suff
 
-nameAttr name attrV pred comp = deep (hasName name) >>> hasAttrValue attrV (pred comp)
+nameAttr
+  :: ArrowXml cat =>
+     String
+     -> String
+     -> (t -> String -> Bool)
+     -> t
+     -> cat (NTree XNode) XmlTree
+nameAttr name attrV p comp = deep (hasName name) >>> hasAttrValue attrV (p comp)
+
+nAt :: ArrowXml cat => String -> cat (NTree XNode) XmlTree
 nAt = nameAttr "span" "class" (==)
+
+gTit :: ArrowXml cat => cat (NTree XNode) XmlTree
 gTit = nAt "group_title"
+
+text :: ArrowXml cat => cat (NTree XNode) String
 text = getChildren >>> getText
 
+(.<) :: ArrowList a => ([c] -> d) -> a b c -> a b d
 (.<) = flip (>.)
-(.<<) = flip (>>.)
-(<\) = flip (/>)
+
+(<\\) :: (ArrowTree a, Tree t) => a (t c) d -> a b (t c) -> a b d
 (<\\) = flip (//>)
 
 
-getCssAttr t attr eq = css t >>> hasAttrValue attr (== eq)
+getCssAttr
+  :: ArrowXml cat =>
+     [Char] -> String -> String -> cat (NTree XNode) XmlTree
+getCssAttr t a eq = css t >>> hasAttrValue a (== eq)
+
+getTorP :: ArrowXml cat => String -> cat (NTree XNode) XmlTree
 getTorP = getCssAttr "td" "class"
 
+getTorrent
+  :: ArrowXml cat => YukariSettings -> cat (NTree XNode) ABTorrent
 getTorrent ys =
   let mainpage = baseSite $ siteSettings ys
   in nameAttr "tr" "class" isInfixOf "torrent  " >>>
@@ -148,6 +169,9 @@ getTorrent ys =
                              }
 
 
+extractTorrentGroups
+  :: ArrowXml cat =>
+     cat a (NTree XNode) -> YukariSettings -> cat a ABTorrentGroup
 extractTorrentGroups doc ys = doc //> css "div" >>> havp "class" "group_cont" >>>
   proc x -> do
     cat <- text <<< css "a" <<< nameAttr "span" "class" (==) "cat"  -< x
@@ -162,7 +186,7 @@ extractTorrentGroups doc ys = doc //> css "div" >>> havp "class" "group_cont" >>
     tors <- listA (getTorrent ys) <<< hasAttrValue "class" (== "torrent_group") <<< multi (hasName "table") -< x
     returnA -< ABTorrentGroup { torrentName = title, torrentCategory = parseCategory cat, seriesID = stripID serID
                               , groupID = stripID grID, torrentImageURI = img, torrentTags = map stripeq tags
-                              , torrents = map (\x -> attachInfo x $ parseInfo (parseCategory cat) (torrentInfoSuffix x)) tors
+                              , torrents = map (\x' -> attachInfo x' $ parseInfo (parseCategory cat) (torrentInfoSuffix x')) tors
                               }
   where
     havp atr content = hasAttrValue atr $ isInfixOf content
@@ -172,16 +196,19 @@ extractTorrentGroups doc ys = doc //> css "div" >>> havp "class" "group_cont" >>
 parseInfo :: Category -> String -> Information
 parseInfo Anime suf = parseAnimeInfo suf
 parseInfo (Manga _) suf = parseMangaInfo suf
-parseInfo cat suf = NoInfo
+parseInfo _ _ = NoInfo
 
 attachInfo :: ABTorrent -> Information -> ABTorrent
 attachInfo t i = t {torrentInfo = i}
 
+extractNextPage
+  :: (ArrowXml cat, ArrowChoice cat) =>
+     cat a (NTree XNode) -> cat a String
 extractNextPage doc = doc /> css "div" >>> hasAttrValue "class" (== "pages")
-                      >>> css "a" >>> proc elem -> do
-  text <- deep getText -< elem
-  if "Next" `isInfixOf` text
-    then getAttrValue "href" -< elem
+                      >>> css "a" >>> proc e -> do
+  t <- deep getText -< e
+  if "Next" `isInfixOf` t
+    then getAttrValue "href" -< e
     else zeroArrow -< ()
 
 parsePage :: YukariSettings -> String -> IO (String, [ABTorrentGroup])
@@ -199,15 +226,16 @@ parseYenPage body = do
   yen <- runX $ doc //> hasAttrValue "href" (== "/konbini.php") /> getText
   links <- runX $ (doc //> hasName "a" >>> getAttrValue "href") >>. filter isExchange
   return YenPage { yenOwned = yenToInt $ head yen
-                 , spendingLinks = map linksToCostLinks links
+                 , spendingLinks = [ x | Just x <- map linksToCostLinks links]
                  }
     where yenToInt = read . reverse . takeWhile isDigit . reverse . filter (/= ',')
           isExchange = isInfixOf "action=exchange"
           linksToCostLinks x
-            | "trade=1" `isInfixOf` x = (1000, x)
-            | "trade=2" `isInfixOf` x = (10000, x)
-            | "trade=3" `isInfixOf` x = (100000, x)
-            | "trade=4" `isInfixOf` x = (1000000, x)
+            | "trade=1" `isInfixOf` x = Just (1000, x)
+            | "trade=2" `isInfixOf` x = Just (10000, x)
+            | "trade=3" `isInfixOf` x = Just (100000, x)
+            | "trade=4" `isInfixOf` x = Just (1000000, x)
+            | otherwise = Nothing
 
 parseCategory :: String -> Category
 parseCategory cat

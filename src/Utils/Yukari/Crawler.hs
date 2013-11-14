@@ -2,7 +2,6 @@ module Utils.Yukari.Crawler (crawlFromURL, crawlFromFile, getSinglePage) where
 
 import           Control.Applicative
 import           Control.Arrow ((&&&))
-import           Control.Concurrent
 import           Control.Monad
 import qualified Data.ByteString as BS
 import           Data.List
@@ -13,20 +12,11 @@ import           System.Directory
 import           System.Exit
 import           System.FilePath
 import           Utils.Yukari.Formatter
-import           Utils.Yukari.Parser (parsePage, parseYenPage)
+import           Utils.Yukari.Parser (parsePage)
 import           Utils.Yukari.Settings
 import           Utils.Yukari.Types
 
 type URL = String
-
--- | 'uncurry' for triples.
-uncurry3 :: (a -> b -> c -> d) -> (a, b, c) -> d
-uncurry3 f (x, y, z) = f x y z
-
--- | Replace all occurances of an element in a list with another.
-replace :: Eq a => a -> a -> [a] -> [a]
-replace c i [] = []
-replace c i (x:xs) = if x == c then i : replace c i xs else x : replace c i xs
 
 -- | Filter out unwanated torrents as per specified function.
 torrentFilter :: (ABTorrent -> Bool) -> [ABTorrentGroup] -> [ABTorrentGroup]
@@ -129,24 +119,24 @@ crawl ys curl url = do
       verbPrint Low ys ["Have", show . sum $ map (length . torrents) groups
                        , "torrents pre-filter."]
       let filtered = torrentFilter (filterFunc settings) groups
-      let all = concatMap (buildTorrentPaths settings) filtered
-      verbPrint Low ys ["Have", show $ length all, "torrents post-filter."]
-      mapM_ (\(fp, url) -> download fp url ys) all
+      let tPaths = concatMap (buildTorrentPaths settings) filtered
+      verbPrint Low ys ["Have", show $ length tPaths, "torrents post-filter."]
+      mapM_ (\(fp, url') -> download fp url' ys) tPaths
       crawl ys curl nextPage
 
 -- | We take settings for the site and a torrent group listing and we try to
 -- assign a file path to each torrent in the group to which the download
 -- will be made.
 buildTorrentPaths :: SiteSettings -> ABTorrentGroup -> [(Maybe FilePath, URL)]
-buildTorrentPaths set group =
-  map (makePath &&& torrentDownloadURI) $ torrents group
+buildTorrentPaths set g =
+  map (makePath &&& torrentDownloadURI) $ torrents g
   where
     makePath :: ABTorrent -> Maybe FilePath
     makePath tor =
       foldl (liftA2 (</>)) (topWatch set)
-      [ watchFunc set $ torrentCategory group
-      , Just $ unwords [ torrentName group, "-"
-                       , show $ torrentCategory group, "~"
+      [ watchFunc set $ torrentCategory g
+      , Just $ unwords [ torrentName g, "-"
+                       , show $ torrentCategory g, "~"
                        , torrentInfoSuffix tor <.> "torrent"
                        ]
       ]
@@ -154,7 +144,6 @@ buildTorrentPaths set group =
 -- | Starts the crawl from a saved page.
 crawlFromFile :: YukariSettings -> FilePath -> IO ()
 crawlFromFile ys f = do
-  let settings = siteSettings ys
   curl <- logonCurl ys
   body' <- readFile f
   (n, _) <- parsePage ys body'

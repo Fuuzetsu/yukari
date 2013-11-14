@@ -1,8 +1,7 @@
 module Utils.Yukari.Settings where
 
 import Utils.Yukari.Types (Category, ABTorrent)
-import System.FilePath
-import Data.Maybe
+
 
 
 data YukariSettings = YukariSettings { siteSettings :: SiteSettings
