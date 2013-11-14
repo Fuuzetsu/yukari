@@ -19,6 +19,7 @@ yukariSettings = YukariSettings
   , programSettings = [DryRun]
   , logVerbosity = Quiet
   , connectionRetries = 0
+  , maxPages = 999999
   }
 
 spendSettings' :: SpendSettings
@@ -37,6 +38,7 @@ siteSettings' = SiteSettings
   , watchFunc = const Nothing
   , filterFunc = const False
   , clobberFiles = False
+  , groupPreprocessor = id
   }
 
 testDir :: FilePath
