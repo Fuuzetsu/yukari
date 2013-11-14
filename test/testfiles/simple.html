@@ -1,0 +1,1019 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Browse Anime Torrents :: AnimeBytes</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="shortcut icon" href="/favicon.ico" />
+	<link rel="search" type="application/opensearchdescription+xml" title="AnimeBytes - Torrents" href="/opensearch_torrents.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="AnimeBytes - Requests" href="/opensearch_requests.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="AnimeBytes - Forums" href="/opensearch_forums.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="AnimeBytes - Log" href="/opensearch_log.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="AnimeBytes - Users" href="/opensearch_users.xml" />
+
+	<link rel="alternate" type="application/rss+xml" href="https://animebytes.tv/feeds.php?feed=rss_torrents_all&amp;user=00000&amp;passkey=notactuallymypasskeyyousillyperson" title="AnimeBytes - All Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="https://animebytes.tv/feeds.php?feed=rss_torrents_anime&amp;user=00000&amp;passkey=notactuallymypasskeyyousillyperson" title="AnimeBytes - Anime Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="https://animebytes.tv/feeds.php?feed=rss_torrents_printed&amp;user=00000&amp;passkey=notactuallymypasskeyyousillyperson" title="AnimeBytes - Printed Media Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="https://animebytes.tv/feeds.php?feed=rss_torrents_games&amp;user=00000&amp;passkey=notactuallymypasskeyyousillyperson" title="AnimeBytes - Game Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="https://animebytes.tv/feeds.php?feed=rss_torrents_music&amp;user=00000&amp;passkey=notactuallymypasskeyyousillyperson" title="AnimeBytes - Music Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="https://animebytes.tv/feeds.php?feed=rss_torrents_mp3&amp;user=00000&amp;passkey=notactuallymypasskeyyousillyperson" title="AnimeBytes - MP3 Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="https://animebytes.tv/feeds.php?feed=rss_torrents_flac&amp;user=00000&amp;passkey=notactuallymypasskeyyousillyperson" title="AnimeBytes - FLAC Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/devblog.php?feed" title="AnimeBytes - Dev Blog" />
+
+	<link href="/static/styles/coalbytes.css" title="coalbytes" rel="stylesheet" type="text/css" media="screen" />
+
+		<link href="/static/styles/log.css" rel="stylesheet" type="text/css" />
+	<link href="/static/styles/global.css" rel="stylesheet" type="text/css" />
+	<link href="/static/styles/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+	<link href="/static/styles/browse2.css" rel="stylesheet" type="text/css" />
+<!--
+		<script src="/static/functions/search_autocomplete.js" type="text/javascript"></script>
+-->
+
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js" type="text/javascript"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js" type="text/javascript"></script>
+	<script src="/static/functions/jquery_custom.js" type="text/javascript"></script>
+	<script src="/static/functions/jquery.fancybox.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
+		var $j = jQuery;
+		var collapsed = [];
+		var CURRENT_USER = {
+			authKey: 'ffffffffffffffffffffffffffffffff'
+		};
+			</script>
+
+	<script src="/static/functions/global.js" type="text/javascript"></script>
+	<script src="/static/functions/browse.js" type="text/javascript"></script>
+</head>
+<body id="torrents">
+<div id="wrapper">
+<h1 class="hidden">AnimeBytes</h1>
+
+
+
+<div id="header">
+	<div id="logo"><a href="/"></a></div>
+	<div id="userinfo">
+		<ul id="userinfo_minor" class="userinfonav">
+			<li id="username_menu" class="navmenu nojs"><a href="/user.php?id=00000" class="username">hi~mi~tsu~</a><span class="dropit hover"><span class="stext">&#x25BC;</span></span>
+			<ul class="subnav nobullet">
+			<li><a href="/user.php?action=edit&amp;userid=00000">Settings</a></li>
+			<li id="intheboxdoingathing" style="display:none;"><a href="/inbox.php">Inbox (999)</a></li>
+			<li><a href="/upload.php">Upload</a></li>
+			<li><a href="/bookmarks.php">Bookmarks</a></li>
+			<li><a href="/user.php?action=notify">Notifications</a></li>
+			<li><a href="/friends.php">Friends</a></li>
+			<li><a href="/user.php?action=invite">Invite (999)</a></li>
+			<li><a href="/user.php?action=mylist&amp;userid=00000">My List</a></li>
+			<li><a href="/logout.php?auth=ffffffffffffffffffffffffffffffff">Logout</a></li>
+			</ul>
+			</li>
+			<li id="inboxiconthingthatwillberemovedlater_btwthenewalertthingisreallycoolsodontbesadibetyouwillforgetaboutthaticon">
+						<a href="/inbox.php"><img src="/static/common/mail.png" alt="Inbox" title="Inbox" /></a>
+			</li>
+			<li id="stats_menu" class="navmenu nojs"><a href="/alltorrents.php?action=history&amp;userid=00000"><span class="r50">12.09</span></a><span class="dropit hover"><span class="stext">&#x25BC;</span></span>
+				<ul class="subnav nobullet">
+			<li><span><strong>Up:</strong> 9999.99 TB</span></li>
+			<li><span><strong>Down:</strong> 6666.66 TB</span></li>
+			<li><span><strong>Total:</strong> 3333.33 TB</span></li>
+			<li><span><strong>Slots:</strong> 9999 / ∞</span></li>
+			<li><a href="/alltorrents.php?action=history&amp;userid=00000">Transfer History</a></li>
+				</ul>
+			</li>
+			<li id="quicklinks" class="navmenu nojs"><a href="/bookmarks.php?action=quicklinks">QLinks</a><span class="dropit hover"><span class="stext">&#x25BC;</span></span>
+			<ul class="subnav">
+			<li><a href="devblog.php">Dev Blog</a></li>
+			<li><a href="imageupload.php">Image Upload</a></li>
+			<li><a href="scholarapp.php">Student Application</a></li>
+			<li><a href="donate.php">Donate</a></li>
+			<li class="center"><a href="#" onclick="Bookmark(); return false;">[Add Current Page]</a></li>
+			</ul>
+			</li>
+			<li id="yen_count"><a href="/konbini.php" title="Click here to spend your bonus points!">&#165;111,111</a></li>
+		</ul>
+	</div>
+	<div id="menu">
+		<h4 class="hidden">Site Menu</h4>
+		<ul class="main-menu nobullet">
+							<li id="nav_torrents" class="navmenu nojs"><a href="/torrents.php">Torrents</a><span class="dropit hover"><span class="stext">&#x25BC;</span></span>
+				<ul class="subnav nobullet">
+				<li id="nav_requests"><a href="/requests.php">Requests</a></li>
+				<li id="nav_screenshots"><a href="/screenshots.php">Screenshots</a></li>
+				<li id="nav_collages"><a href="/collage.php">Collages</a></li>
+				<li id="nav_projects"><a href="/projects.php">Projects</a></li>
+				<li id="nav_series"><a href="/serieslist.php">Series</a></li>
+				<li id="nav_torrents_upload"><a href="/upload.php">Upload</a></li>
+				</ul>
+				</li>
+				<li id="nav_forums"><a href="/forums.php">Forums</a></li>
+				<li id="nav_irc"><a href="/irc.php">IRC</a></li>
+				<li id="nav_kb"><a href="/kb.php">Wiki</a></li>
+				<li id="nav_siteinfo" class="navmenu nojs"><a href="/siteinfo.php">Site Info</a><span class="dropit hover"><span class="stext">&#x25BC;</span></span>
+				<ul class="subnav nobullet">
+				<li id="nav_rules"><a href="/rules.php">Rules</a></li>
+				<li id="nav_about"><a href="/about.php">About</a></li>
+				<li id="nav_devblog"><a href="/devblog.php">Dev Blog</a></li>
+				<li id="nav_top10"><a href="/top10.php">Top 10</a></li>
+				<li id="nav_staffpm"><a href="/staffpm.php">PM the Staff</a></li>
+				</ul>
+				</li>
+		</ul>
+	</div>
+
+</div>
+<a href="/index.php"></a>
+	<div id="searchbars">
+		<ul>
+			<li>
+				<span class="hidden">Series: </span>
+				<form action="series.php" method="get">
+					<input
+						onfocus="if (this.value == 'Series') this.value='';"
+						onblur="if (this.value == '') this.value='Series';"
+						id="series_search" value="Series" type="text" name="name" size="20"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+
+			<li>
+				<span class="hidden">Torrents: </span>
+				<form action="torrents2.php" method="get">
+					<input
+						onfocus="if (this.value == 'Albums') this.value='';"
+						onblur="if (this.value == '') this.value='Albums';"
+						value="Albums" type="text" name="groupname" size="20"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+
+			<li>
+				<span class="hidden">Artist: </span>
+				<form action="artist.php" method="get">
+					<input
+						onfocus="if (this.value == 'Artist') this.value='';"
+						onblur="if (this.value == '') this.value='Artist';"
+						id="artist_search" value="Artist" type="text" name="name" size="20"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+
+						<li>
+				<span class="hidden">Forums: </span>
+				<form action="forums.php" method="get">
+					<input value="search" type="hidden" name="action" />
+					<input
+						onfocus="if (this.value == 'Forums') this.value='';"
+						onblur="if (this.value == '') this.value='Forums';"
+						value="Forums" type="text" name="search" size="20"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Users: </span>
+				<form action="user.php" method="get">
+					<input type="hidden" name="action" value="search" />
+					<input
+						onfocus="if (this.value == 'Users') this.value='';"
+						onblur="if (this.value == '') this.value='Users';"
+						value="Users" type="text" name="username" size="20"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+		</ul>
+	</div>
+
+<div id="content">
+	<div id="alerts">
+	</div><div class="thin">
+
+<div id="browse_nav_top">
+	<h2 id="browse_nav_top_left">
+	Browsing Torrents:
+	</h2>
+
+	<div id="browse_nav_sections">
+		<h2>
+			<a href="/torrents.php">Anime</a> &bull;
+			<a href="/torrents2.php">Music</a> &bull;
+			<a href="/torrents2.php?filter_osts=1">OST</a>
+		</h2>
+		<ul id="categories" class="nobullet">
+			<li><a href="torrents.php?filter_cat[1]=1">Anime</a></li>
+			<li><a href="torrents.php?filter_cat[2]=1">Printed Media</a></li>
+			<li><a href="torrents.php?filter_cat[3]=1">Games</a></li>
+			<li><a href="torrents.php?filter_cat[4]=1">Live Action</a></li>
+			<li><a href="torrents.php?filter_cat[5]=1">Packs</a></li>
+		</ul>
+	</div>
+
+</div>
+
+<div id="browse_nav_bottom">
+	<div id="browse_search" class="box pad" style="text-align:center;">
+		<!-- <a id="toggle_search" onclick="toggleSearch(); return false;">[Toggle Search Section]</a> -->
+			<form action="" method="get" id="filter" name="filter">
+				<div class="search_section">
+					<div id="accordion">
+												<h3><a href="#">General Options</a></h3>
+						<div>
+							<dl class="box pad">
+								<dt>Search name:</dt>
+								<div style="margin: 0 0 0 200px;">
+									<dd style="margin:0px; border:none; float:left;">
+										<div id="series_names_anime" class="yui-skin-sam">
+											<input type="text" class="series_name standard_fields" id="series_name_anime" name="searchstr" size="40" value="lia" />
+											<input type="hidden" value="advanced" name="action">
+											<div id="series_anime_ac" class="series_name_ac"></div>
+											<script type="text/javascript"> create_series_ac('series_name_anime', 'series_anime_ac', '300px'); </script>
+										</div>
+									</dd>
+									<dd style="margin-left:125px; border:none;">
+										<select name="search_type" style="width:auto;">
+											<option value="title" selected="selected">Title</option>
+											<option value="people" >People</option>
+											<option value="company" >Company</option>
+										</select>
+									</dd>
+								</div>
+								<dt>Year</dt>
+								<dd>
+									<input type="text" size="6" name="year" class="inputtext smallest" value="" />&nbsp;&nbsp; <strong>to</strong> &nbsp;&nbsp;
+									<input type="text" size="6" name="year2" class="inputtext smallest" value="" />&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;&nbsp;&nbsp;
+										<input type="checkbox" name="vintage[1960]" id="vintage_1960" value="1"  />
+									<label for="vintage_1960"><strong>1960s</strong></label>&nbsp;&nbsp;&nbsp;
+										<input type="checkbox" name="vintage[1970]" id="vintage_1970" value="1"  />
+									<label for="vintage_1970"><strong>1970s</strong></label>&nbsp;&nbsp;&nbsp;
+										<input type="checkbox" name="vintage[1980]" id="vintage_1980" value="1"  />
+									<label for="vintage_1980"><strong>1980s</strong></label>&nbsp;&nbsp;&nbsp;
+										<input type="checkbox" name="vintage[1990]" id="vintage_1990" value="1"  />
+									<label for="vintage_1990"><strong>1990s</strong></label>&nbsp;&nbsp;&nbsp;
+										<input type="checkbox" name="vintage[2000]" id="vintage_2000" value="1"  />
+									<label for="vintage_2000"><strong>2000s</strong></label>&nbsp;&nbsp;&nbsp;
+									</dd>
+								<dt>Tags</dt>
+								<dd>
+									<input type="text" size="40" id="tags" name="tags" class="inputtext smaller" value="" />&nbsp;
+									<input type="radio" name="tags_type" id="tags_type0" value="0" checked="checked" /> <label for="tags_type0">Any</label>&nbsp;&nbsp;
+									<input type="radio" name="tags_type" id="tags_type1" value="1"  /> <label for="tags_type1">All</label>
+								</dd>
+								<dt>Sorting</dt>
+								<dd>
+									<select name="sort">
+										<option value="time_added" selected="selected">Time Added</option>
+										<option value="relevance" >Relevance</option>
+										<option value="name" >Name</option>
+										<option value="year" >Year</option>
+										<option value="size" >Size</option>
+										<option value="snatched" >Snatched</option>
+										<option value="seeders" >Seeders</option>
+										<option value="leechers" >Leechers</option>
+										<option value="rating" >Rating</option>
+									</select>
+									<select name="way">
+										<option value="desc" selected="selected">Descending</option>
+										<option value="asc" >Ascending</option>
+									</select>
+								</dd>
+								<dt>Other Options</dt>
+								<dd>
+									<label for="hentai"><strong>Hentai</strong></label>
+									<select name="hentai" style="width:auto;">
+										<option value="2" selected="selected">Yes</option>
+										<option value="0" >No</option>
+										<option value="1" >Fap</option>
+									</select>
+									&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="freeleech" id="freeleech" value="1"  /> <label for="freeleech"><strong>Freeleech</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="exclusive" id="exclusive" value="1"  /> <label for="exclusive"><strong>Exclusive</strong></label>
+								</dd>
+							</dl>
+						</div>
+
+						<h3><a href="#">Anime Search Options</a></h3>
+						<div style="display:none;">
+							<dl class="box pad">
+								<dt>Anime Type</dt>
+								<dd>
+									<input type="checkbox" name="anime[tv_series]" id="anime_tv_series" value="1"  />
+									<label for="anime_tv_series"><strong>TV Series</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="anime[tv_special]" id="anime_tv_special" value="1"  />
+									<label for="anime_tv_special"><strong>TV Special</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="anime[movie]" id="anime_movie" value="1"  />
+									<label for="anime_movie"><strong>Movie</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="anime[ova]" id="anime_ova" value="1"  />
+									<label for="anime_ova"><strong>OVA</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="anime[ona]" id="anime_ona" value="1"  />
+									<label for="anime_ona"><strong>ONA</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="anime[dvd_special]" id="anime_dvd_special" value="1"  />
+									<label for="anime_dvd_special"><strong>DVD Special</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="anime[bd_special]" id="anime_bd_special" value="1"  />
+									<label for="anime_bd_special"><strong>BD Special</strong></label>&nbsp;&nbsp;&nbsp;
+								</dd>
+								<dt>Video Source</dt>
+								<dd>
+									<input type="checkbox" name="media[tv]" id="media_tv" value="1"  />
+									<label for="media_tv"><strong>TV</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="media[dvd]" id="media_dvd" value="1"  />
+									<label for="media_dvd"><strong>DVD</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="media[dvd5]" id="media_dvd5" value="1"  />
+									<label for="media_dvd5"><strong>DVD5</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="media[dvd9]" id="media_dvd9" value="1"  />
+									<label for="media_dvd9"><strong>DVD9</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="media[bluray]" id="media_bluray" value="1"  />
+									<label for="media_bluray"><strong>Bluray</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="media[hd_dvd]" id="media_hd_dvd" value="1"  />
+									<label for="media_hd_dvd"><strong>HD DVD</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="media[vhs]" id="media_vhs" value="1"  />
+									<label for="media_vhs"><strong>VHS</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="media[ld]" id="media_ld" value="1"  />
+									<label for="media_ld"><strong>LD</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="media[web]" id="media_web" value="1"  />
+									<label for="media_web"><strong>Web</strong></label>&nbsp;&nbsp;&nbsp;
+								</dd>
+								<dt>Containers</dt>
+								<dd>
+									<input type="checkbox" name="containers[avi]" id="containers_avi" value="1"  />
+									<label for="containers_avi"><strong>AVI</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="containers[mkv]" id="containers_mkv" value="1"  />
+									<label for="containers_mkv"><strong>MKV</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="containers[mp4]" id="containers_mp4" value="1"  />
+									<label for="containers_mp4"><strong>MP4</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="containers[ogm]" id="containers_ogm" value="1"  />
+									<label for="containers_ogm"><strong>OGM</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="containers[wmv]" id="containers_wmv" value="1"  />
+									<label for="containers_wmv"><strong>WMV</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="containers[iso]" id="containers_iso" value="1"  />
+									<label for="containers_iso"><strong>ISO</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="containers[vob_ifo]" id="containers_vob_ifo" value="1"  />
+									<label for="containers_vob_ifo"><strong>VOB IFO</strong></label>&nbsp;&nbsp;&nbsp;
+								</dd>
+								<dt>Codecs</dt>
+								<dd>
+									<input type="checkbox" name="codecs[h264]" id="codecs_h264" value="1"  />
+									<label for="codecs_h264"><strong>h264</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="codecs[h264_hi10p]" id="codecs_h264_hi10p" value="1"  />
+									<label for="codecs_h264_hi10p"><strong>h264 Hi10P</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="codecs[xvid]" id="codecs_xvid" value="1"  />
+									<label for="codecs_xvid"><strong>XviD</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="codecs[divx]" id="codecs_divx" value="1"  />
+									<label for="codecs_divx"><strong>DivX</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="codecs[wmv]" id="codecs_wmv" value="1"  />
+									<label for="codecs_wmv"><strong>WMV</strong></label>&nbsp;&nbsp;&nbsp;
+								</dd>
+								<dt>Resolution</dt>
+								<dd>
+									<input type="checkbox" name="resolution[640x480]" id="resolution_640x480" value="1"  />
+									<label for="resolution_640x480"><strong>640x480</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[720x480]" id="resolution_720x480" value="1"  />
+									<label for="resolution_720x480"><strong>720x480</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[704x396]" id="resolution_704x396" value="1"  />
+									<label for="resolution_704x396"><strong>704x396</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[848x480]" id="resolution_848x480" value="1"  />
+									<label for="resolution_848x480"><strong>848x480</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[720p]" id="resolution_720p" value="1"  />
+									<label for="resolution_720p"><strong>720p</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[1080p]" id="resolution_1080p" value="1"  />
+									<label for="resolution_1080p"><strong>1080p</strong></label>&nbsp;&nbsp;&nbsp;
+								</dd>
+								<dt>Audio Codec</dt>
+								<dd>
+									<input type="checkbox" name="resolution[mp3]" id="resolution_mp3" value="1"  />
+									<label for="resolution_mp3"><strong>MP3</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[ogg]" id="resolution_ogg" value="1"  />
+									<label for="resolution_ogg"><strong>OGG</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[aac]" id="resolution_aac" value="1"  />
+									<label for="resolution_aac"><strong>AAC</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[aac_5.1]" id="resolution_aac_5.1" value="1"  />
+									<label for="resolution_aac_5.1"><strong>AAC 5.1</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[ac3]" id="resolution_ac3" value="1"  />
+									<label for="resolution_ac3"><strong>AC3</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[ac3_5.1]" id="resolution_ac3_5.1" value="1"  />
+									<label for="resolution_ac3_5.1"><strong>AC3 5.1</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[dts_5.1]" id="resolution_dts_5.1" value="1"  />
+									<label for="resolution_dts_5.1"><strong>DTS 5.1</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[dts-es_6.1]" id="resolution_dts-es_6.1" value="1"  />
+									<label for="resolution_dts-es_6.1"><strong>DTS-ES 6.1</strong></label>&nbsp;&nbsp;&nbsp;
+<br />									<input type="checkbox" name="resolution[flac_2.0]" id="resolution_flac_2.0" value="1"  />
+									<label for="resolution_flac_2.0"><strong>FLAC 2.0</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[flac_5.1]" id="resolution_flac_5.1" value="1"  />
+									<label for="resolution_flac_5.1"><strong>FLAC 5.1</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[flac_6.1]" id="resolution_flac_6.1" value="1"  />
+									<label for="resolution_flac_6.1"><strong>FLAC 6.1</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[pcm_2.0]" id="resolution_pcm_2.0" value="1"  />
+									<label for="resolution_pcm_2.0"><strong>PCM 2.0</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[pcm_5.1]" id="resolution_pcm_5.1" value="1"  />
+									<label for="resolution_pcm_5.1"><strong>PCM 5.1</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="resolution[pcm_6.0]" id="resolution_pcm_6.0" value="1"  />
+									<label for="resolution_pcm_6.0"><strong>PCM 6.0</strong></label>&nbsp;&nbsp;&nbsp;
+								</dd>
+								<dt>Release Group Name</dt>
+								<dd>
+									<input type="text" size="40" name="releasegroup" class="inputtext smaller" value="" />
+								</dd>
+								<dt>Other Options</dt>
+								<dd>
+																		<input type="checkbox" name="animetrans[softsubs]" id="animetrans_softsubs" value="1"  />
+									<label for="animetrans_softsubs"><strong>Softsubs</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="animetrans[hardsubs]" id="animetrans_hardsubs" value="1"  />
+									<label for="animetrans_hardsubs"><strong>Hardsubs</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="animetrans[raw]" id="animetrans_raw" value="1"  />
+									<label for="animetrans_raw"><strong>RAW</strong></label>&nbsp;&nbsp;&nbsp;
+<br/><br/>
+									<input type="checkbox" name="dualaudio" id="dualaudio" value="1"  /> <label for="dualaudio"><strong>Dual-Audio</strong></label>
+								</dd>
+								<dt>Episode Count</dt>
+								<dd>
+									<input type="text" size="6" name="epcount" class="inputtext smallest" value="" />&nbsp;&nbsp;to&nbsp;&nbsp;<input type="text" size="6" name="epcount2" class="inputtext smallest" value="" />
+									&nbsp;&nbsp;&nbsp;||&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="eprange[1]" id="eprange_1" value="1"  /> <label for="eprange_1"><strong>1-3 episodes</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="eprange[2]" id="eprange_2" value="1"  /> <label for="eprange_2"><strong>4-8 episodes</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="eprange[3]" id="eprange_3" value="1"  /> <label for="eprange_3"><strong>9-14 episodes</strong></label>&nbsp;&nbsp;&nbsp;
+<br />									<input type="checkbox" name="eprange[4]" id="eprange_4" value="1"  /> <label for="eprange_4"><strong>15-27 episodes</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="eprange[5]" id="eprange_5" value="1"  /> <label for="eprange_5"><strong>28-52 episodes</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="eprange[6]" id="eprange_6" value="1"  /> <label for="eprange_6"><strong>53-150 episodes</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="eprange[7]" id="eprange_7" value="1"  /> <label for="eprange_7"><strong>151+ episodes</strong></label>&nbsp;&nbsp;&nbsp;
+								</dd>
+							</dl>
+						</div>
+
+						<h3><a href="#">Printed Media Search Options</a></h3>
+						<div style="display:none;">
+							<dl class="box pad">
+																<dt>Type</dt>
+								<dd>
+									<input type="checkbox" name="printedtype[manga]" id="printedtype_manga" value="1"  />
+									<label for="printedtype_manga"><strong>Manga</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="printedtype[oneshot]" id="printedtype_oneshot" value="1"  />
+									<label for="printedtype_oneshot"><strong>Oneshot</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="printedtype[anthology]" id="printedtype_anthology" value="1"  />
+									<label for="printedtype_anthology"><strong>Anthology</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="printedtype[manhwa]" id="printedtype_manhwa" value="1"  />
+									<label for="printedtype_manhwa"><strong>Manhwa</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="printedtype[manhua]" id="printedtype_manhua" value="1"  />
+									<label for="printedtype_manhua"><strong>Manhua</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="printedtype[light_novel]" id="printedtype_light_novel" value="1"  />
+									<label for="printedtype_light_novel"><strong>Light Novel</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="printedtype[novel]" id="printedtype_novel" value="1"  />
+									<label for="printedtype_novel"><strong>Novel</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="printedtype[artbook]" id="printedtype_artbook" value="1"  />
+									<label for="printedtype_artbook"><strong>Artbook</strong></label>&nbsp;&nbsp;&nbsp;
+								</dd>
+								<dt>Artbook Title</dt>
+								<dd>
+									<input type="text" size="40" name="artbooktitle" class="inputtext smaller" value="" />
+								</dd>
+								<dt>Other Options</dt>
+								<dd>
+									<input type="checkbox" name="scanlated" id="scanlated" value="1"  /> <label for="scanlated"><strong>Scanlated</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="raw" id="raw" value="1"  /> <label for="raw"><strong>Raw</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="ongoing" id="ongoing" value="1"  /> <label for="ongoing"><strong>Ongoing</strong></label>
+								</dd>
+							</dl>
+						</div>
+
+						<h3><a href="#">Game Search Options</a></h3>
+						<div style="display:none;">
+							<dl class="box pad">
+								<dt>Type</dt>
+								<dd>
+									<input type="checkbox" name="game[game]" id="game_game" value="1"  />
+									<label for="game_game"><strong>Game</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="game[cg_set]" id="game_cg_set" value="1"  />
+									<label for="game_cg_set"><strong>CG Set</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="game[guide]" id="game_guide" value="1"  />
+									<label for="game_guide"><strong>Guide</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="game[promo_disc]" id="game_promo_disc" value="1"  />
+									<label for="game_promo_disc"><strong>Promo Disc</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="game[patch]" id="game_patch" value="1"  />
+									<label for="game_patch"><strong>Patch</strong></label>&nbsp;&nbsp;&nbsp;
+								</dd>
+								<dt>Game Platforms</dt>
+								<dd>
+									<input type="checkbox" name="platform[pc]" id="platform_pc" value="1"  />
+									<label for="platform_pc"><strong>PC</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="platform[ps2]" id="platform_ps2" value="1"  />
+									<label for="platform_ps2"><strong>PS2</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="platform[psp]" id="platform_psp" value="1"  />
+									<label for="platform_psp"><strong>PSP</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="platform[wii]" id="platform_wii" value="1"  />
+									<label for="platform_wii"><strong>Wii</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="platform[nds]" id="platform_nds" value="1"  />
+									<label for="platform_nds"><strong>NDS</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="platform[gba]" id="platform_gba" value="1"  />
+									<label for="platform_gba"><strong>GBA</strong></label>&nbsp;&nbsp;&nbsp;
+								</dd>
+								<dt>Game Regions</dt>
+								<dd>
+									<input type="checkbox" name="region[ntsc-j]" id="region_ntsc-j" value="1"  />
+									<label for="region_ntsc-j"><strong>NTSC-J</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="region[ntsc-u]" id="region_ntsc-u" value="1"  />
+									<label for="region_ntsc-u"><strong>NTSC-U</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="region[pal]" id="region_pal" value="1"  />
+									<label for="region_pal"><strong>PAL</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="region[jpn]" id="region_jpn" value="1"  />
+									<label for="region_jpn"><strong>JPN</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="region[eng]" id="region_eng" value="1"  />
+									<label for="region_eng"><strong>ENG</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="region[eur]" id="region_eur" value="1"  />
+									<label for="region_eur"><strong>EUR</strong></label>&nbsp;&nbsp;&nbsp;
+								</dd>
+								<dt>Other Options</dt>
+								<dd>
+									<input type="checkbox" name="translated" id="translated" value="1"  /> <label for="translated"><strong>Translated</strong></label>&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="visual_novel" id="visual_novel" value="1"  /> <label for="visual_novel"><strong>Visual Novel</strong></label>
+								</dd>
+							</dl>
+						</div>
+					</div>
+				</div>
+				<div class="submit" style="margin: 10px 0px">
+					<input type="submit" value="Filter Torrents" class="btn-sub" />
+					<input type="button" onclick="location.href='torrents.php?action=advanced'" value="Reset" />&nbsp;&nbsp;
+					<input type="submit" value="Make Default" name="setdefault" />
+				</div>
+			</form>
+	</div>
+	<div id="browse_nav_tags" >
+		<a href="/torrents.php?tags=action" class="tag_cloud level_2">action</a> <a href="/torrents.php?tags=adult" class="tag_cloud level_1">adult</a> <a href="/torrents.php?tags=adventure" class="tag_cloud level_2">adventure</a> <a href="/torrents.php?tags=alien" class="tag_cloud level_1">alien</a> <a href="/torrents.php?tags=aliens" class="tag_cloud level_1">aliens</a> <a href="/torrents.php?tags=angst" class="tag_cloud level_1">angst</a> <a href="/torrents.php?tags=bondage" class="tag_cloud level_1">bondage</a> <a href="/torrents.php?tags=comedy" class="tag_cloud level_4">comedy</a> <a href="/torrents.php?tags=coming.of.age" class="tag_cloud level_1">coming.of.age</a> <a href="/torrents.php?tags=comingofage" class="tag_cloud level_1">comingofage</a> <a href="/torrents.php?tags=conspiracy" class="tag_cloud level_1">conspiracy</a> <a href="/torrents.php?tags=contemporary.fantasy" class="tag_cloud level_1">contemporary.fantasy</a> <a href="/torrents.php?tags=cyberpunk" class="tag_cloud level_1">cyberpunk</a> <a href="/torrents.php?tags=cyborgs" class="tag_cloud level_1">cyborgs</a> <a href="/torrents.php?tags=daily.life" class="tag_cloud level_1">daily.life</a> <a href="/torrents.php?tags=demons" class="tag_cloud level_1">demons</a> <a href="/torrents.php?tags=dildos..vibrators" class="tag_cloud level_1">dildos..vibrators</a> <a href="/torrents.php?tags=drama" class="tag_cloud level_4">drama</a> <a href="/torrents.php?tags=ecchi" class="tag_cloud level_2">ecchi</a> <a href="/torrents.php?tags=elf" class="tag_cloud level_1">elf</a> <a href="/torrents.php?tags=elves" class="tag_cloud level_1">elves</a> <a href="/torrents.php?tags=erotic.game" class="tag_cloud level_1">erotic.game</a> <a href="/torrents.php?tags=family" class="tag_cloud level_1">family</a> <a href="/torrents.php?tags=fantasy" class="tag_cloud level_3">fantasy</a> <a href="/torrents.php?tags=female.student" class="tag_cloud level_1">female.student</a> <a href="/torrents.php?tags=femdom" class="tag_cloud level_1">femdom</a> <a href="/torrents.php?tags=gender.bender" class="tag_cloud level_1">gender.bender</a> <a href="/torrents.php?tags=genetic.modification" class="tag_cloud level_1">genetic.modification</a> <a href="/torrents.php?tags=gunfights" class="tag_cloud level_1">gunfights</a> <a href="/torrents.php?tags=harem" class="tag_cloud level_2">harem</a> <a href="/torrents.php?tags=high.school" class="tag_cloud level_1">high.school</a> <a href="/torrents.php?tags=highschool" class="tag_cloud level_1">highschool</a> <a href="/torrents.php?tags=historical" class="tag_cloud level_1">historical</a> <a href="/torrents.php?tags=horror" class="tag_cloud level_1">horror</a> <a href="/torrents.php?tags=housewives" class="tag_cloud level_1">housewives</a> <a href="/torrents.php?tags=human.enhancement" class="tag_cloud level_1">human.enhancement</a> <a href="/torrents.php?tags=humanoid" class="tag_cloud level_1">humanoid</a> <a href="/torrents.php?tags=humanoid.alien" class="tag_cloud level_1">humanoid.alien</a> <a href="/torrents.php?tags=josei" class="tag_cloud level_1">josei</a> <a href="/torrents.php?tags=large.breasts" class="tag_cloud level_1">large.breasts</a> <a href="/torrents.php?tags=mafia" class="tag_cloud level_1">mafia</a> <a href="/torrents.php?tags=magic" class="tag_cloud level_1">magic</a> <a href="/torrents.php?tags=mahou.shoujo" class="tag_cloud level_1">mahou.shoujo</a> <a href="/torrents.php?tags=manga" class="tag_cloud level_2">manga</a> <a href="/torrents.php?tags=mature" class="tag_cloud level_1">mature</a> <a href="/torrents.php?tags=mecha" class="tag_cloud level_1">mecha</a> <a href="/torrents.php?tags=middle.school" class="tag_cloud level_1">middle.school</a> <a href="/torrents.php?tags=military" class="tag_cloud level_1">military</a> <a href="/torrents.php?tags=music" class="tag_cloud level_1">music</a> <a href="/torrents.php?tags=netorare" class="tag_cloud level_1">netorare</a> <a href="/torrents.php?tags=novel" class="tag_cloud level_1">novel</a> <a href="/torrents.php?tags=nudity" class="tag_cloud level_1">nudity</a> <a href="/torrents.php?tags=parallel.universe" class="tag_cloud level_1">parallel.universe</a> <a href="/torrents.php?tags=psychological" class="tag_cloud level_2">psychological</a> <a href="/torrents.php?tags=rape" class="tag_cloud level_1">rape</a> <a href="/torrents.php?tags=robots" class="tag_cloud level_1">robots</a> <a href="/torrents.php?tags=romance" class="tag_cloud level_5">romance</a> <a href="/torrents.php?tags=school" class="tag_cloud level_1">school</a> <a href="/torrents.php?tags=school.life" class="tag_cloud level_3">school.life</a> <a href="/torrents.php?tags=schoollife" class="tag_cloud level_1">schoollife</a> <a href="/torrents.php?tags=scifi" class="tag_cloud level_2">scifi</a> <a href="/torrents.php?tags=seinen" class="tag_cloud level_2">seinen</a> <a href="/torrents.php?tags=sex" class="tag_cloud level_2">sex</a> <a href="/torrents.php?tags=shorts" class="tag_cloud level_1">shorts</a> <a href="/torrents.php?tags=shoujo" class="tag_cloud level_3">shoujo</a> <a href="/torrents.php?tags=shoujo.ai" class="tag_cloud level_1">shoujo.ai</a> <a href="/torrents.php?tags=shounen" class="tag_cloud level_3">shounen</a> <a href="/torrents.php?tags=slice.of.life" class="tag_cloud level_1">slice.of.life</a> <a href="/torrents.php?tags=smut" class="tag_cloud level_1">smut</a> <a href="/torrents.php?tags=sports" class="tag_cloud level_2">sports</a> <a href="/torrents.php?tags=super.power" class="tag_cloud level_1">super.power</a> <a href="/torrents.php?tags=supernatural" class="tag_cloud level_1">supernatural</a> <a href="/torrents.php?tags=swordplay" class="tag_cloud level_1">swordplay</a> <a href="/torrents.php?tags=tragedy" class="tag_cloud level_3">tragedy</a> <a href="/torrents.php?tags=underworld" class="tag_cloud level_1">underworld</a> <a href="/torrents.php?tags=vibrators" class="tag_cloud level_1">vibrators</a> <a href="/torrents.php?tags=yakuza" class="tag_cloud level_1">yakuza</a> <a href="/torrents.php?tags=yaoi" class="tag_cloud level_1">yaoi</a> <a href="/torrents.php?tags=yuri" class="tag_cloud level_1">yuri</a> 	</div>
+	<span id="show_hide_tags">
+		&nbsp; <a href="#" onclick="return swapTagList();" id="swaptags">Hide Tags</a>
+	</span>
+	<span id="browse_nav_left">
+		Sort:&nbsp;&nbsp;&nbsp;<a href="torrents.php?searchstr=lia&action=advanced&search_type=title&hentai=2&sort=time_added&way=asc">Recent</a> | <a href="torrents.php?searchstr=lia&action=advanced&search_type=title&hentai=2&sort=rating&way=desc">Popularity</a>
+	</span>
+	<span id="browse_nav_right">
+		<a href="#browse_nav_right" onclick="toggleAllTorrents(true);return false;">Expand all</a> | <a href="#browse_nav_right" onclick="toggleAllTorrents(false);return false;">Collapse all</a>
+	</span>
+	<span id="browse_result_count">
+		7 Results in <strong>4 ms</strong>
+	</span>
+</div>
+
+	<div class="pages"></div>
+	<div class="group_cont box oneshot" id="group_15259" >
+		<div class="group_img">
+			<span class="cat"><a href="/torrents.php?searchstr=lia&action=advanced&search_type=title&sort=time_added&way=desc&hentai=2&filter_cat[2]=1&printedtype[oneshot]=1">Oneshot</a></span>
+			<span class="mainimg">
+				<a href="torrents.php?id=15259"><img src="//mei.animebytes.tv/images/small-f04c8b21f41b09485390ba0fb7b860c0.png" alt="Liar and the Ferris Wheel - Oneshot&nbsp;&nbsp;[2013]" title="Liar and the Ferris Wheel - Oneshot&nbsp;&nbsp;[2013]" /></a>
+			</span>
+		</div>
+
+		<div class="group_statbox">
+			<ul>
+				<li><strong>Synonyms:</strong> </li>
+				<li><strong>Snatches:</strong> 80</li>
+				<li><strong>Comments:</strong> 0</li>
+				<li><strong>More Info:</strong> <a href="http://www.mangaupdates.com/series.html?id=102878">Manga-Updates</a></li>
+			</ul>
+		</div>
+
+		<div class="group_main">
+			<span class="group_title">
+				<strong><a href="/series.php?id=15976">Liar and the Ferris Wheel</a> - <a href="torrents.php?id=15259" title="View Torrent">Oneshot</a>&nbsp;&nbsp;[2013]&nbsp;</strong>
+No votes.			</span>
+			<div class="tags_sm topt"><br /><div class="tags"><a href="torrents.php?tags=shoujo.ai">shoujo.ai</a></div></div>
+
+<p>Not available yet.</p>			<!-- top or bottom?? -->
+			<div class="tags_sm" style="display:none;"><br /><div class="tags"><a href="torrents.php?tags=shoujo.ai">shoujo.ai</a></div></div>
+			<table class="torrent_group">
+				<tr>
+				<th class="torrent_properties"><a onclick="toggleTorrents('15259')">[-]</a>Torrents: 2 <em>(0 in the last month)</em></th>
+				<th class="torrent_size" title="Size"><span class="hide">Size</span></th>
+				<th class="torrent_snatched" title="Snatched"><span class="hide">Snatched</span></th>
+				<th class="torrent_seeders" title="Seeders"><span class="hide">Seeders</span></th>
+				<th class="torrent_leechers" title="Leechers"><span class="hide">Leechers</span></th>
+				</tr>
+
+				<tr id="torrent_87112" class="torrent  group_torrents_15259 ">
+					<td class="torrent_properties">
+						<span class="download_link">[<a href="torrents.php?action=download&amp;id=87112&amp;authkey=ffffffffffffffffffffffffffffffff&amp;torrent_pass=notactuallymypasskeyyousillyperson" title="Download">DL</a>]</span> &nbsp;
+						<a href="torrents.php?id=15259&amp;torrentid=87112">Scanlated | Archived (ZIP)</a>
+					</td>
+					<td class="torrent_size"><span>10.41 MB</span></td>
+					<td class="torrent_snatched" title="Snatched"><span>46</span></td>
+					<td class="torrent_seeders" title="Seeders"><span>24</span></td>
+					<td class="torrent_leechers" title="Leechers"><span>0</span></td>
+				</tr>
+				<tr id="torrent_87113" class="torrent  group_torrents_15259 ">
+					<td class="torrent_properties">
+						<span class="download_link">[<a href="torrents.php?action=download&amp;id=87113&amp;authkey=ffffffffffffffffffffffffffffffff&amp;torrent_pass=notactuallymypasskeyyousillyperson" title="Download">DL</a>]</span> &nbsp;
+						<a href="torrents.php?id=15259&amp;torrentid=87113">Scanlated | Unarchived</a>
+					</td>
+					<td class="torrent_size"><span>10.41 MB</span></td>
+					<td class="torrent_snatched" title="Snatched"><span>34</span></td>
+					<td class="torrent_seeders" title="Seeders"><span>22</span></td>
+					<td class="torrent_leechers" title="Leechers"><span>0</span></td>
+				</tr>
+</table>
+		</div>
+	</div>
+	<div class="group_cont box live_action_movie" id="group_8913" >
+		<div class="group_img">
+			<span class="cat"><a href="/torrents.php?searchstr=lia&action=advanced&search_type=title&sort=time_added&way=desc&hentai=2&filter_cat[4]=1&anime[live_action_movie]=1">Live Action Movie</a></span>
+			<span class="mainimg">
+				<a href="torrents.php?id=8913"><img src="//mei.animebytes.tv/images/small-69fe84f4faa49869a68433c6cbb6bf7a.jpeg" alt="Liar Game: The Final Stage - Live Action Movie&nbsp;&nbsp;[2010]" title="Liar Game: The Final Stage - Live Action Movie&nbsp;&nbsp;[2010]" /></a>
+			</span>
+		</div>
+
+		<div class="group_statbox">
+			<ul>
+				<li><strong>Synonyms:</strong> ライアーゲーム　ザ・ファイナルステージ</li>
+				<li><strong>Snatches:</strong> 14</li>
+				<li><strong>Comments:</strong> 0</li>
+			</ul>
+		</div>
+
+		<div class="group_main">
+			<span class="group_title">
+				<strong><a href="/series.php?id=10010">Liar Game: The Final Stage</a> - <a href="torrents.php?id=8913" title="View Torrent">Live Action Movie</a>&nbsp;&nbsp;[2010]&nbsp;</strong>
+					Avg Vote: 7 (out of 2 votes)
+			</span>
+			<div class="tags_sm topt"><br /><div class="tags"><a href="torrents.php?tags=drama">drama</a>, <a href="torrents.php?tags=psychological">psychological</a>, <a href="torrents.php?tags=thriller">thriller</a></div></div>
+
+<p>Based on a manga created by Kaitani Shinobu, this movie is set where the 2nd season of the drama series left off. In the first series, a college student Nao Kanzaki is lured into a mysterious game by tricking other players to win. However Nao got tricked by her former sensei, desperate for help, she enlisted the aid of person named Shinichi Akiyama. In the second series, the duo is faced against...</p>			<!-- top or bottom?? -->
+			<div class="tags_sm" style="display:none;"><br /><div class="tags"><a href="torrents.php?tags=drama">drama</a>, <a href="torrents.php?tags=psychological">psychological</a>, <a href="torrents.php?tags=thriller">thriller</a></div></div>
+			<table class="torrent_group">
+				<tr>
+				<th class="torrent_properties"><a onclick="toggleTorrents('8913')">[-]</a>Torrents: 2 <em>(0 in the last month)</em></th>
+				<th class="torrent_size" title="Size"><span class="hide">Size</span></th>
+				<th class="torrent_snatched" title="Snatched"><span class="hide">Snatched</span></th>
+				<th class="torrent_seeders" title="Seeders"><span class="hide">Seeders</span></th>
+				<th class="torrent_leechers" title="Leechers"><span class="hide">Leechers</span></th>
+				</tr>
+
+				<tr id="torrent_37996" class="torrent  group_torrents_8913 ">
+					<td class="torrent_properties">
+						<span class="download_link">[<a href="torrents.php?action=download&amp;id=37996&amp;authkey=ffffffffffffffffffffffffffffffff&amp;torrent_pass=notactuallymypasskeyyousillyperson" title="Download">DL</a>]</span> &nbsp;
+						<a href="torrents.php?id=8913&amp;torrentid=37996">Bluray | MP4 | h264 | 720p | AAC | Hardsubs (sars)</a>
+					</td>
+					<td class="torrent_size"><span>1.83 GB</span></td>
+					<td class="torrent_snatched" title="Snatched"><span>8</span></td>
+					<td class="torrent_seeders" title="Seeders"><span>1</span></td>
+					<td class="torrent_leechers" title="Leechers"><span>0</span></td>
+				</tr>
+				<tr id="torrent_41205" class="torrent  group_torrents_8913 ">
+					<td class="torrent_properties">
+						<span class="download_link">[<a href="torrents.php?action=download&amp;id=41205&amp;authkey=ffffffffffffffffffffffffffffffff&amp;torrent_pass=notactuallymypasskeyyousillyperson" title="Download">DL</a>]</span> &nbsp;
+						<a href="torrents.php?id=8913&amp;torrentid=41205">Bluray | MKV | h264 | 720p | DTS 5.1 | Softsubs (WiKi)</a>
+					</td>
+					<td class="torrent_size"><span>6.49 GB</span></td>
+					<td class="torrent_snatched" title="Snatched"><span>6</span></td>
+					<td class="torrent_seeders" title="Seeders"><span>2</span></td>
+					<td class="torrent_leechers" title="Leechers"><span>0</span></td>
+				</tr>
+</table>
+		</div>
+	</div>
+	<div class="group_cont box manga" id="group_8841" >
+		<div class="group_img">
+			<span class="cat"><a href="/torrents.php?searchstr=lia&action=advanced&search_type=title&sort=time_added&way=desc&hentai=2&filter_cat[2]=1&printedtype[manga]=1">Manga</a></span>
+			<span class="mainimg">
+				<a href="torrents.php?id=8841"><img src="//mei.animebytes.tv/images/small-8c1a7848343b9f08cef0102c06afd8ed.jpeg" alt="Liar Game - Manga&nbsp;&nbsp;[2005]" title="Liar Game - Manga&nbsp;&nbsp;[2005]" /></a>
+			</span>
+		</div>
+
+		<div class="group_statbox">
+			<ul>
+				<li><strong>Synonyms:</strong> ライアー　ゲーム</li>
+				<li><strong>Snatches:</strong> 33</li>
+				<li><strong>Comments:</strong> 1</li>
+				<li><strong>More Info:</strong> <a href="http://www.mangaupdates.com/series.html?id=3296">Manga-Updates</a></li>
+			</ul>
+		</div>
+
+		<div class="group_main">
+			<span class="group_title">
+				<strong><a href="/series.php?id=9935">Liar Game</a> - <a href="torrents.php?id=8841" title="View Torrent">Manga</a>&nbsp;&nbsp;[2005]&nbsp;</strong>
+					Avg Vote: 10 (out of 3 votes)
+			</span>
+			<div class="tags_sm topt"><br /><div class="tags"><a href="torrents.php?tags=drama">drama</a>, <a href="torrents.php?tags=psychological">psychological</a>, <a href="torrents.php?tags=seinen">seinen</a></div></div>
+
+<p>The card reads as follows:<br />
+Congratulations! You are one of the 1 in 100,000 people who has been entered in the amazing LIAR GAME TOURNAMENT!<br />
+<br />
+Along with the postcard there is 100 million yen in notes. That's the beginning of the Liar Game. When the game ends, in 30 days, you will have to return your 100 million. If your opponent steals them, he can keep them as a prize, and you will have a debt...</p>			<!-- top or bottom?? -->
+			<div class="tags_sm" style="display:none;"><br /><div class="tags"><a href="torrents.php?tags=drama">drama</a>, <a href="torrents.php?tags=psychological">psychological</a>, <a href="torrents.php?tags=seinen">seinen</a></div></div>
+			<table class="torrent_group">
+				<tr>
+				<th class="torrent_properties"><a onclick="toggleTorrents('8841')">[-]</a>Torrents: 1 <em>(0 in the last month)</em></th>
+				<th class="torrent_size" title="Size"><span class="hide">Size</span></th>
+				<th class="torrent_snatched" title="Snatched"><span class="hide">Snatched</span></th>
+				<th class="torrent_seeders" title="Seeders"><span class="hide">Seeders</span></th>
+				<th class="torrent_leechers" title="Leechers"><span class="hide">Leechers</span></th>
+				</tr>
+
+					<tr class="edition_info"><td class=" " colspan="5"><strong>
+						Ongoing&nbsp;&nbsp;/&nbsp;&nbsp;Publisher: <a href="/company.php?id=701">Shueisha</a>					</strong></td></tr>
+				<tr class="edition_info"><td class=" group_torrents_8841" colspan="5">
+Volumes 1-16				</td></tr>
+				<tr id="torrent_80326" class="torrent  group_torrents_8841 ">
+					<td class="torrent_properties">
+						<span class="download_link">[<a href="torrents.php?action=download&amp;id=80326&amp;authkey=ffffffffffffffffffffffffffffffff&amp;torrent_pass=notactuallymypasskeyyousillyperson" title="Download">DL</a>]</span> &nbsp;
+						<a href="torrents.php?id=8841&amp;torrentid=80326">Scanlated | Archived (RAR) | Ongoing</a>
+					</td>
+					<td class="torrent_size"><span>943.76 MB</span></td>
+					<td class="torrent_snatched" title="Snatched"><span>33</span></td>
+					<td class="torrent_seeders" title="Seeders"><span>8</span></td>
+					<td class="torrent_leechers" title="Leechers"><span>0</span></td>
+				</tr>
+</table>
+		</div>
+	</div>
+	<div class="group_cont box oneshot" id="group_10932" >
+		<div class="group_img">
+			<span class="cat"><a href="/torrents.php?searchstr=lia&action=advanced&search_type=title&sort=time_added&way=desc&hentai=2&filter_cat[2]=1&printedtype[oneshot]=1">Oneshot</a></span>
+			<span class="mainimg">
+				<a href="torrents.php?id=10932"><img src="//mei.animebytes.tv/images/small-a98d11096acd12735ebb744f0907675a.jpeg" alt="Cigarette Liar - Oneshot&nbsp;&nbsp;[2012]" title="Cigarette Liar - Oneshot&nbsp;&nbsp;[2012]" /></a>
+			</span>
+		</div>
+
+		<div class="group_statbox">
+			<ul>
+				<li><strong>Synonyms:</strong> </li>
+				<li><strong>Snatches:</strong> 218</li>
+				<li><strong>Comments:</strong> 0</li>
+				<li><strong>More Info:</strong> <a href="http://www.mangaupdates.com/series.html?id=82720">Manga-Updates</a></li>
+			</ul>
+		</div>
+
+		<div class="group_main">
+			<span class="group_title">
+				<strong><a href="/series.php?id=11842">Cigarette Liar</a> - <a href="torrents.php?id=10932" title="View Torrent">Oneshot</a>&nbsp;&nbsp;[2012]&nbsp;</strong>
+No votes.			</span>
+			<div class="tags_sm topt"><br /><div class="tags"><a href="torrents.php?tags=comedy">comedy</a>, <a href="torrents.php?tags=romance">romance</a>, <a href="torrents.php?tags=school.life">school.life</a>, <a href="torrents.php?tags=yuri">yuri</a>, <a href="torrents.php?tags=yuri.project">yuri.project</a></div></div>
+
+<p>Tokiwa is always being chased around by the strange Shimizu from the Public Morals Committee about her smoking. One day she gets caught again, and Shimizu does something unusual to her...</p>			<!-- top or bottom?? -->
+			<div class="tags_sm" style="display:none;"><br /><div class="tags"><a href="torrents.php?tags=comedy">comedy</a>, <a href="torrents.php?tags=romance">romance</a>, <a href="torrents.php?tags=school.life">school.life</a>, <a href="torrents.php?tags=yuri">yuri</a>, <a href="torrents.php?tags=yuri.project">yuri.project</a></div></div>
+			<table class="torrent_group">
+				<tr>
+				<th class="torrent_properties"><a onclick="toggleTorrents('10932')">[-]</a>Torrents: 2 <em>(0 in the last month)</em></th>
+				<th class="torrent_size" title="Size"><span class="hide">Size</span></th>
+				<th class="torrent_snatched" title="Snatched"><span class="hide">Snatched</span></th>
+				<th class="torrent_seeders" title="Seeders"><span class="hide">Seeders</span></th>
+				<th class="torrent_leechers" title="Leechers"><span class="hide">Leechers</span></th>
+				</tr>
+
+					<tr class="edition_info"><td class=" " colspan="5"><strong>
+						1 volume&nbsp;&nbsp;/&nbsp;&nbsp;Publisher: <a href="/company.php?id=698">Enterbrain</a>					</strong></td></tr>
+				<tr id="torrent_49211" class="torrent  group_torrents_10932 ">
+					<td class="torrent_properties">
+						<span class="download_link">[<a href="torrents.php?action=download&amp;id=49211&amp;authkey=ffffffffffffffffffffffffffffffff&amp;torrent_pass=notactuallymypasskeyyousillyperson" title="Download">DL</a>]</span> &nbsp;
+						<a href="torrents.php?id=10932&amp;torrentid=49211">Scanlated | Archived (ZIP)</a>
+					</td>
+					<td class="torrent_size"><span>6.10 MB</span></td>
+					<td class="torrent_snatched" title="Snatched"><span>125</span></td>
+					<td class="torrent_seeders" title="Seeders"><span>39</span></td>
+					<td class="torrent_leechers" title="Leechers"><span>0</span></td>
+				</tr>
+				<tr id="torrent_49212" class="torrent  group_torrents_10932 ">
+					<td class="torrent_properties">
+						<span class="download_link">[<a href="torrents.php?action=download&amp;id=49212&amp;authkey=ffffffffffffffffffffffffffffffff&amp;torrent_pass=notactuallymypasskeyyousillyperson" title="Download">DL</a>]</span> &nbsp;
+						<a href="torrents.php?id=10932&amp;torrentid=49212">Scanlated | Unarchived</a>
+					</td>
+					<td class="torrent_size"><span>6.10 MB</span></td>
+					<td class="torrent_snatched" title="Snatched"><span>93</span></td>
+					<td class="torrent_seeders" title="Seeders"><span>36</span></td>
+					<td class="torrent_leechers" title="Leechers"><span>0</span></td>
+				</tr>
+</table>
+		</div>
+	</div>
+	<div class="group_cont box manga" id="group_9607" >
+		<div class="group_img">
+			<span class="cat"><a href="/torrents.php?searchstr=lia&action=advanced&search_type=title&sort=time_added&way=desc&hentai=2&filter_cat[2]=1&printedtype[manga]=1">Manga</a></span>
+			<span class="mainimg">
+				<a href="torrents.php?id=9607"><img src="//mei.animebytes.tv/images/small-24d850ad0f742793f1e18b6540760c55.png" alt="Liar Game - Roots of A - Manga&nbsp;&nbsp;[2008]" title="Liar Game - Roots of A - Manga&nbsp;&nbsp;[2008]" /></a>
+			</span>
+		</div>
+
+		<div class="group_statbox">
+			<ul>
+				<li><strong>Synonyms:</strong> </li>
+				<li><strong>Snatches:</strong> 31</li>
+				<li><strong>Comments:</strong> 0</li>
+				<li><strong>More Info:</strong> <a href="http://www.mangaupdates.com/series.html?id=34340">Manga-Updates</a></li>
+			</ul>
+		</div>
+
+		<div class="group_main">
+			<span class="group_title">
+				<strong><a href="/series.php?id=10616">Liar Game - Roots of A</a> - <a href="torrents.php?id=9607" title="View Torrent">Manga</a>&nbsp;&nbsp;[2008]&nbsp;</strong>
+No votes.			</span>
+			<div class="tags_sm topt"><br /><div class="tags"><a href="torrents.php?tags=drama">drama</a>, <a href="torrents.php?tags=psychological">psychological</a>, <a href="torrents.php?tags=seinen">seinen</a></div></div>
+
+<p>Roots of A is essentially a manga short featuring Akiyama during his senior year of college. In it, Akiyama and four of his classmates are taking a criminal psychology course and given an assignment where they must construct a profile of a person based on a letter they sent. This outcome of the assignment, plus what the professor says afterwards, is what prompts Akiyama to enter grad-school and...</p>			<!-- top or bottom?? -->
+			<div class="tags_sm" style="display:none;"><br /><div class="tags"><a href="torrents.php?tags=drama">drama</a>, <a href="torrents.php?tags=psychological">psychological</a>, <a href="torrents.php?tags=seinen">seinen</a></div></div>
+			<table class="torrent_group">
+				<tr>
+				<th class="torrent_properties"><a onclick="toggleTorrents('9607')">[-]</a>Torrents: 1 <em>(0 in the last month)</em></th>
+				<th class="torrent_size" title="Size"><span class="hide">Size</span></th>
+				<th class="torrent_snatched" title="Snatched"><span class="hide">Snatched</span></th>
+				<th class="torrent_seeders" title="Seeders"><span class="hide">Seeders</span></th>
+				<th class="torrent_leechers" title="Leechers"><span class="hide">Leechers</span></th>
+				</tr>
+
+				<tr id="torrent_41460" class="torrent  group_torrents_9607 ">
+					<td class="torrent_properties">
+						<span class="download_link">[<a href="torrents.php?action=download&amp;id=41460&amp;authkey=ffffffffffffffffffffffffffffffff&amp;torrent_pass=notactuallymypasskeyyousillyperson" title="Download">DL</a>]</span> &nbsp;
+						<a href="torrents.php?id=9607&amp;torrentid=41460">Scanlated | Archived (ZIP)</a>
+					</td>
+					<td class="torrent_size"><span>48.68 MB</span></td>
+					<td class="torrent_snatched" title="Snatched"><span>31</span></td>
+					<td class="torrent_seeders" title="Seeders"><span>4</span></td>
+					<td class="torrent_leechers" title="Leechers"><span>0</span></td>
+				</tr>
+</table>
+		</div>
+	</div>
+	<div class="group_cont box live_action_tv_series" id="group_8912" >
+		<div class="group_img">
+			<span class="cat"><a href="/torrents.php?searchstr=lia&action=advanced&search_type=title&sort=time_added&way=desc&hentai=2&filter_cat[4]=1&anime[live_action_tv_series]=1">Live Action TV Series</a></span>
+			<span class="mainimg">
+				<a href="torrents.php?id=8912"><img src="//mei.animebytes.tv/images/small-aeb702e6c7bdb2079b0ce53612f8555b.jpeg" alt="Liar Game Season 2 - Live Action TV Series&nbsp;&nbsp;[2009]" title="Liar Game Season 2 - Live Action TV Series&nbsp;&nbsp;[2009]" /></a>
+			</span>
+		</div>
+
+		<div class="group_statbox">
+			<ul>
+				<li><strong>Synonyms:</strong> </li>
+				<li><strong>Snatches:</strong> 16</li>
+				<li><strong>Comments:</strong> 0</li>
+			</ul>
+		</div>
+
+		<div class="group_main">
+			<span class="group_title">
+				<strong><a href="/series.php?id=10009">Liar Game Season 2</a> - <a href="torrents.php?id=8912" title="View Torrent">Live Action TV Series</a>&nbsp;&nbsp;[2009]&nbsp;</strong>
+					Avg Vote: 7 (out of 2 votes)
+			</span>
+			<div class="tags_sm topt"><br /><div class="tags"><a href="torrents.php?tags=drama">drama</a>, <a href="torrents.php?tags=psychological">psychological</a>, <a href="torrents.php?tags=thriller">thriller</a></div></div>
+
+<p>The naïve Kanzaki Nao and expert swindler Akiyama Shinichi have not heard anything from the LIAR GAME organization since the end of the previous game, so it seems they may have actually escaped. But Nao suddenly gets another invitation and is once again caught up in the game. This time, she has to team up with Shinichi and one of their previous rivals named Fukunaga, facing off against three...</p>			<!-- top or bottom?? -->
+			<div class="tags_sm" style="display:none;"><br /><div class="tags"><a href="torrents.php?tags=drama">drama</a>, <a href="torrents.php?tags=psychological">psychological</a>, <a href="torrents.php?tags=thriller">thriller</a></div></div>
+			<table class="torrent_group">
+				<tr>
+				<th class="torrent_properties"><a onclick="toggleTorrents('8912')">[-]</a>Torrents: 2 <em>(0 in the last month)</em></th>
+				<th class="torrent_size" title="Size"><span class="hide">Size</span></th>
+				<th class="torrent_snatched" title="Snatched"><span class="hide">Snatched</span></th>
+				<th class="torrent_seeders" title="Seeders"><span class="hide">Seeders</span></th>
+				<th class="torrent_leechers" title="Leechers"><span class="hide">Leechers</span></th>
+				</tr>
+
+				<tr id="torrent_37995" class="torrent  group_torrents_8912 ">
+					<td class="torrent_properties">
+						<span class="download_link">[<a href="torrents.php?action=download&amp;id=37995&amp;authkey=ffffffffffffffffffffffffffffffff&amp;torrent_pass=notactuallymypasskeyyousillyperson" title="Download">DL</a>]</span> &nbsp;
+						<a href="torrents.php?id=8912&amp;torrentid=37995">TV | AVI | XviD | 704x396 | MP3 | Softsubs (d-addicts)</a>
+					</td>
+					<td class="torrent_size"><span>4.43 GB</span></td>
+					<td class="torrent_snatched" title="Snatched"><span>13</span></td>
+					<td class="torrent_seeders" title="Seeders"><span>3</span></td>
+					<td class="torrent_leechers" title="Leechers"><span>0</span></td>
+				</tr>
+				<tr id="torrent_41180" class="torrent  group_torrents_8912 ">
+					<td class="torrent_properties">
+						<span class="download_link">[<a href="torrents.php?action=download&amp;id=41180&amp;authkey=ffffffffffffffffffffffffffffffff&amp;torrent_pass=notactuallymypasskeyyousillyperson" title="Download">DL</a>]</span> &nbsp;
+						<a href="torrents.php?id=8912&amp;torrentid=41180">TV | MP4 | h264 | 720p | AAC | Hardsubs (sars)</a>
+					</td>
+					<td class="torrent_size"><span>4.84 GB</span></td>
+					<td class="torrent_snatched" title="Snatched"><span>3</span></td>
+					<td class="torrent_seeders" title="Seeders"><span>1</span></td>
+					<td class="torrent_leechers" title="Leechers"><span>0</span></td>
+				</tr>
+</table>
+		</div>
+	</div>
+	<div class="group_cont box live_action_tv_series" id="group_6985" >
+		<div class="group_img">
+			<span class="cat"><a href="/torrents.php?searchstr=lia&action=advanced&search_type=title&sort=time_added&way=desc&hentai=2&filter_cat[4]=1&anime[live_action_tv_series]=1">Live Action TV Series</a></span>
+			<span class="mainimg">
+				<a href="torrents.php?id=6985"><img src="//mei.animebytes.tv/images/small-dc76dd833be24fe55380731c61c846b8.jpeg" alt="Liar Game Season 1 - Live Action TV Series&nbsp;&nbsp;[2007]" title="Liar Game Season 1 - Live Action TV Series&nbsp;&nbsp;[2007]" /></a>
+			</span>
+		</div>
+
+		<div class="group_statbox">
+			<ul>
+				<li><strong>Synonyms:</strong> ライアーゲーム</li>
+				<li><strong>Snatches:</strong> 35</li>
+				<li><strong>Comments:</strong> 3</li>
+			</ul>
+		</div>
+
+		<div class="group_main">
+			<span class="group_title">
+				<strong><a href="/series.php?id=8315">Liar Game Season 1</a> - <a href="torrents.php?id=6985" title="View Torrent">Live Action TV Series</a>&nbsp;&nbsp;[2007]&nbsp;</strong>
+					Avg Vote: 8 (out of 3 votes)
+			</span>
+			<div class="tags_sm topt"><br /><div class="tags"><a href="torrents.php?tags=drama">drama</a>, <a href="torrents.php?tags=psychological">psychological</a></div></div>
+
+<p>Based on the Manga with the same name.<br />
+<br />
+Kanzaki Nao is an honest college student who receives a hundred million yen one day, along with a card saying she has been chosen to take part in the &quot;Liar Game&quot;. The aim of the game is to trick the other players out of their hundred million dollars. At the end, the winner gets the hundred million and the loser is a hundred million yen in debt. The next...</p>			<!-- top or bottom?? -->
+			<div class="tags_sm" style="display:none;"><br /><div class="tags"><a href="torrents.php?tags=drama">drama</a>, <a href="torrents.php?tags=psychological">psychological</a></div></div>
+			<table class="torrent_group">
+				<tr>
+				<th class="torrent_properties"><a onclick="toggleTorrents('6985')">[-]</a>Torrents: 2 <em>(0 in the last month)</em></th>
+				<th class="torrent_size" title="Size"><span class="hide">Size</span></th>
+				<th class="torrent_snatched" title="Snatched"><span class="hide">Snatched</span></th>
+				<th class="torrent_seeders" title="Seeders"><span class="hide">Seeders</span></th>
+				<th class="torrent_leechers" title="Leechers"><span class="hide">Leechers</span></th>
+				</tr>
+
+				<tr id="torrent_37994" class="torrent  group_torrents_6985 ">
+					<td class="torrent_properties">
+						<span class="download_link">[<a href="torrents.php?action=download&amp;id=37994&amp;authkey=ffffffffffffffffffffffffffffffff&amp;torrent_pass=notactuallymypasskeyyousillyperson" title="Download">DL</a>]</span> &nbsp;
+						<a href="torrents.php?id=6985&amp;torrentid=37994">TV | AVI | DivX | 704x396 | MP3 | Hardsubs (d-addicts)</a>
+					</td>
+					<td class="torrent_size"><span>3.95 GB</span></td>
+					<td class="torrent_snatched" title="Snatched"><span>5</span></td>
+					<td class="torrent_seeders" title="Seeders"><span>0</span></td>
+					<td class="torrent_leechers" title="Leechers"><span>0</span></td>
+				</tr>
+				<tr id="torrent_28546" class="torrent  group_torrents_6985 ">
+					<td class="torrent_properties">
+						<span class="download_link">[<a href="torrents.php?action=download&amp;id=28546&amp;authkey=ffffffffffffffffffffffffffffffff&amp;torrent_pass=notactuallymypasskeyyousillyperson" title="Download">DL</a>]</span> &nbsp;
+						<a href="torrents.php?id=6985&amp;torrentid=28546">TV | AVI | DivX | 720p | MP3 | Softsubs</a>
+					</td>
+					<td class="torrent_size"><span>11.57 GB</span></td>
+					<td class="torrent_snatched" title="Snatched"><span>30</span></td>
+					<td class="torrent_seeders" title="Seeders"><span>4</span></td>
+					<td class="torrent_leechers" title="Leechers"><span>0</span></td>
+				</tr>
+</table>
+		</div>
+	</div>
+	<div class="pages"></div>
+</div>
+</div> <!-- content end -->
+<div id="footer">
+<div id="footer_inner">
+<div class="footer_column">
+<h3>Site Info</h3>
+<ul class="nobullet">
+<li><a href="/rules.php">Rules</a></li>
+<li><a href="/about.php">About</a></li>
+<li><a href="/about.php?action=stats">Stats</a></li>
+</ul>
+</div>
+<div class="footer_column">
+<h3>Torrents</h3>
+<ul class="nobullet">
+<li><a href="/torrents.php">Anime</a></li>
+<li><a href="/torrents2.php">Music</a></li>
+<li><a href="/torrents2.php?filter_osts=1">OSTs</a></li>
+</ul>
+</div>
+<div class="footer_column">
+<h3>Help</h3>
+<ul class="nobullet">
+<li><a href="/forums.php?action=viewforum&amp;forumid=14">Help Forum</a></li>
+<li><a href="/kb.php">Wiki</a></li>
+<li><a href="/staffpm.php">PM the Staff</a></li>
+<li><a href="/forums.php?action=viewforum&amp;forumid=16">Report a Bug</a></li>
+</ul>
+</div>
+<div class="footer_column" id="donation_column">
+		£39 / £100	<br/>
+	<center><a href="/donate.php"><span class="percent"><span style="width:39%">39%</span></span></a></center><br/>
+</div>
+</div>
+<br/><br/>
+Powered by Tentacles ( r0)
+<br/>
+<hr />
+Site and design &copy; 2013 AnimeBytes
+</div> <!-- footer end -->
+</div> <!-- wrapper end -->
+<div id="lightbox" class="lightbox hidden"></div>
+<div id="curtain" class="curtain hidden"></div>
+
+<!-- Extra divs, for stylesheet developers to add imagery -->
+<div id="extra1"><span></span></div>
+<div id="extra2"><span></span></div>
+<div id="extra3"><span></span></div>
+<div id="extra4"><span></span></div>
+<div id="extra5"><span></span></div>
+<div id="extra6"><span></span></div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-16055118-1']);
+  _gaq.push(['_setDomainName', 'animebytes.tv']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</body>
+</html>
