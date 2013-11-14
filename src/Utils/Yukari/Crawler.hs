@@ -163,8 +163,8 @@ download path url ys =
       b <- doesFileExist p
       when b $ verbPrint Low ys ["Skipping already downloaded", p]
       if dry
-        then putStrLn $ unwords [ "Dry run enabled, would download ", url
-                                , " to ", p, " otherwise."]
+        then verbPrint Debug ys [ "Dry run enabled, would download", url
+                                , "to", p, "otherwise."]
         else when (clobber || not b) $ do
           res <- openURI url
           case res of
