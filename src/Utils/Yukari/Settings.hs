@@ -1,6 +1,7 @@
 module Utils.Yukari.Settings where
 
-import Utils.Yukari.Types (Category, ABTorrent, ABTorrentGroup)
+import Data.List (isPrefixOf)
+import Utils.Yukari.Types
 
 
 
@@ -46,3 +47,41 @@ minimalSettings u p l = SiteSettings { username = u
                                      , clobberFiles = False
                                      , groupPreprocessor = id
                                      }
+
+-- | Some defaults for the current AnimeBytes site
+animebytesSettings :: YukariSettings
+animebytesSettings = YukariSettings
+  { siteSettings = abSiteSettings
+  , spendSettings = abSpendSettings
+  , programSettings = []
+  , logVerbosity = Low
+  , connectionRetries = 3
+  }
+
+abSiteSettings :: SiteSettings
+abSiteSettings = SiteSettings
+  { username = ""
+  , password = ""
+  , baseSite = "https://animebytes.tv"
+  , loginSite = "https://animebytes.tv/login.php"
+  , searchSite = "https://animebytes.tv/torrents.php"
+  , topWatch = Nothing
+  , watchFunc = const Nothing
+  , filterFunc = const False
+  , clobberFiles = False
+  , groupPreprocessor = fixImageLinks
+  }
+  where
+    -- Images nowadays seem to start with this weird link that can't be accessed
+    -- from a browser unless we're on the page already and directly click on it.
+    -- We fix that here.
+    fixImageLinks :: ABTorrentGroup -> ABTorrentGroup
+    fixImageLinks g = let img = torrentImageURI g
+                      in if "//" `isPrefixOf`img
+                         then g { torrentImageURI = "https:" ++ img }
+                         else g
+
+abSpendSettings :: SpendSettings
+abSpendSettings = SpendSettings { yenSite = "https://animebytes.tv/konbini.php"
+                                , yenLeftOver = 0
+                                }
