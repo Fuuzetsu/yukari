@@ -142,22 +142,21 @@ getTorrent ys =
         tlchr <- deep getText <<< getTorP "torrent_leechers" -< x
         tsdr <- deep getText <<< getTorP "torrent_seeders" -< x
         tsize <- deep getText <<< getTorP "torrent_size" -< x
-        returnA -< ABTorrent { torrentID = read $ stripeg '_' tID, torrentURI = mainpage ++ tLink, torrentDownloadURI = mainpage ++ tDown
+        returnA -< ABTorrent { torrentID = read $ stripeg '_' tID, torrentURI = mainpage ++ "/" ++ tLink, torrentDownloadURI = mainpage ++ "/" ++ tDown
                              , torrentInfoSuffix = procSuff tInfSuf, torrentInfo = NoInfo, torrentSnatched = read tstch
                              , torrentLeechers = read tlchr, torrentSeeders = read tsdr, torrentSize =  sizeToBytes tsize
                              }
 
---extractTorrentGroups :: String -> [ABTorrentGroup]
+
 extractTorrentGroups doc ys = doc //> css "div" >>> havp "class" "group_cont" >>>
   proc x -> do
-    cat <- text <<< nameAttr "span" "class" (==) "cat"  -< x
+    cat <- text <<< css "a" <<< nameAttr "span" "class" (==) "cat"  -< x
     img <- css "img" ! "src" <<< nAt "mainimg" -< x
     serID <- getAttrValue "href" <<< havp "href" "series.php"
-             <<< css "a" <<< gTit-< x
+             <<< css "a" <<< gTit -< x
     grID <- getAttrValue "href" <<< havp "href" "torrents.php"
             <<< css "a" <<< gTit -< x
-    title <- getText <<< getChildren <<< havpa "series"
-             <<< css "a" <<< gTit -< x
+    title <- getText <<< getChildren <<< havpa "series"-< x
     tags <- listA $ css "a" ! "href" <<< hasAttrValue "class" (== "tags_sm")
             <<< multi (hasName "div") -< x
     tors <- listA (getTorrent ys) <<< hasAttrValue "class" (== "torrent_group") <<< multi (hasName "table") -< x
