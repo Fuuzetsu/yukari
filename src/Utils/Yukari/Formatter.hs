@@ -1,6 +1,12 @@
 module Utils.Yukari.Formatter where
 
+import Control.Monad (when)
+import Data.List (intersperse)
 import Utils.Yukari.Types
+import Utils.Yukari.Settings
+
+verbPrint :: Verbosity -> YukariSettings -> [String] -> IO ()
+verbPrint v ys s = when (v >= logVerbosity ys) (putStrLn $ unwords s)
 
 prettyGroup :: ABTorrentGroup -> String
 prettyGroup g = torrentName g ++ " - " ++ show (torrentCategory g) ++ "\n" ++

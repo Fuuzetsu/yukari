@@ -3,6 +3,7 @@ module Utils.Yukari.Spender (spendYen) where
 import Data.List (intersperse)
 import Utils.Yukari.Settings
 import Utils.Yukari.Crawler (getSinglePage)
+import Utils.Yukari.Formatter
 import Utils.Yukari.Parser (parseYenPage)
 import Utils.Yukari.Types
 import Control.Monad
@@ -10,24 +11,20 @@ import Control.Monad
 spendYen :: YukariSettings -> IO ()
 spendYen ys = do
   let rs = siteSettings ys
-  let v = logVerbosity ys
   page <- parseYenPage =<< getSinglePage rs (yenSite $ spendSettings ys)
-  verb Low ["Currently have", show $ yenOwned page, "yen."]
-  verb High ["Leftover yen limit set to", show . yenLeftOver $ spendSettings ys]
+  verbPrint Low ys ["Currently have", show $ yenOwned page, "yen."]
+  verbPrint High ys ["Leftover yen limit set to", show . yenLeftOver $ spendSettings ys]
 
   case chooseOptimal (spendSettings ys) (attachBase page) of
-    Nothing -> when (v >= Low) (putStrLn "No viable spending found")
+    Nothing -> verbPrint Low ys ["No viable spending option found"]
     Just (cost, link) -> do
-      verb Low ["Spending", show cost, "yen."]
-      verb High ["Spending the yen at", link]
+      verbPrint Low ys ["Spending", show cost, "yen."]
+      verbPrint High ys ["Spending the yen at", link]
       getSinglePage rs link >> spendYen ys
   where
     attachBase :: YenPage -> YenPage
     attachBase yp = yp { spendingLinks = map (\(c, l) -> (,) c (baseSite (siteSettings ys) ++ "/" ++ l)) (spendingLinks yp)}
 
-    verb :: Verbosity -> [String] -> IO ()
-    verb v s = when (v >= logVerbosity ys)
-               (putStrLn . intersperse ' ' $ concat s)
 
 chooseOptimal :: SpendSettings -> YenPage -> Maybe (Cost, String)
 chooseOptimal ys yp = let l = filterUnwanted ys yp

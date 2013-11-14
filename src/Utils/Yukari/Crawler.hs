@@ -79,15 +79,16 @@ crawl :: YukariSettings -> Curl -> String -> IO ()
 crawl _ _ "" = return ()
 crawl ys curl url = do
   let settings = siteSettings ys
-  when (logVerbosity ys >= Low) (putStrLn $ "Crawling " ++ url)
+  verbPrint Low ys ["Crawling", url]
   body <- getInternalPage curl url
 
   pa@(nextPage, groups) <- parsePage body
   when (logVerbosity ys >= High) (prettyPage pa)
-  when (logVerbosity ys >= Low) (putStrLn $ "Have " ++ show (sum (map (length . torrents) groups)) ++ " torrents pre-filter.")
+  verbPrint Low ys ["Have", show . sum $ map (length . torrents) groups
+                   , "torrents pre-filter."]
   let filtered = torrentFilter (filterFunc settings) groups
   let all = concatMap (buildTorrentPaths settings) filtered
-  when (logVerbosity ys >= Low) (putStrLn $ "Have " ++ show (length all) ++ " torrents post-filter.")
+  verbPrint Low ys ["Have", show $ length all, "torrents post-filter."]
   mapM_ (\(fp, url) -> download fp url ys) all
   crawl ys curl nextPage
 
@@ -120,21 +121,23 @@ getSinglePage settings url = logonCurl settings >>= flip getInternalPage url
 
 download :: Maybe FilePath -> String -> YukariSettings -> IO ()
 download path url ys =
-  let verb = logVerbosity ys
-      clobber = clobberFiles $ siteSettings ys
+  let clobber = clobberFiles $ siteSettings ys
       dry = DryRun `elem` programSettings ys
   in
   case path of
-    Nothing -> when (verb >= Low) (putStrLn "Skipping empty path.")
+    Nothing -> verbPrint Low ys ["Skipping empty path."]
     Just p -> do
       b <- doesFileExist p
-      when (verb >= Low && b) (putStrLn $ "Skipping already downloaded " ++ p)
+      when b $ verbPrint Low ys ["Skipping already downloaded", p]
       if dry
-        then putStrLn $ "Dry run enabled, would download " ++ url ++ " to " ++ p ++ " otherwise."
+        then putStrLn $ unwords [ "Dry run enabled, would download ", url
+                                , " to ", p, " otherwise."]
         else when (clobber || not b) $ do
           res <- openURI url
           case res of
-            Left e -> putStrLn $ "Error " ++ e ++ " occured when downloading from " ++ url
-            Right bs -> when (verb >= Low) (putStrLn ("Downloading " ++ p)) >>
-                        createDirectoryIfMissing True (takeDirectory p) >>
-                        BS.writeFile p bs
+            Left e -> putStrLn $
+                      unwords [ "Error ", e, " occured when downloading from "
+                              , url]
+            Right bs -> verbPrint Low ys ["Downloading ", p]
+                        >> createDirectoryIfMissing True (takeDirectory p)
+                        >> BS.writeFile p bs
