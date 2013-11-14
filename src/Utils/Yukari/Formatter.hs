@@ -17,7 +17,7 @@ prettyTorrent :: ABTorrent -> String
 prettyTorrent t = torrentInfoSuffix t ++ "\tSize: " ++ show (torrentSize t) ++ "\tSeeders: " ++ show (torrentSeeders t)
                   ++ "\nLink: " ++ torrentURI t ++ "\nDownload: " ++ torrentDownloadURI t ++ "\n" ++ prettyInfo (torrentInfo t)
 
-prettyResolution :: Resolution -> [Char]
+prettyResolution :: Resolution -> String
 prettyResolution (Resolution w h) = show w ++ " x " ++ show h
 
 prettyInfo :: Information -> String

@@ -4,6 +4,7 @@ module Utils.Yukari.Parser (parsePage, parseYenPage) where
 
 -- import qualified Data.Attoparsec.Text as A
 import           Data.Char
+import           Data.Maybe (mapMaybe)
 import           Data.List
 import           Data.Text (pack, unpack, split)
 import           Data.Tree.NTree.TypeDefs
@@ -140,7 +141,7 @@ text = getChildren >>> getText
 
 getCssAttr
   :: ArrowXml cat =>
-     [Char] -> String -> String -> cat (NTree XNode) XmlTree
+     String -> String -> String -> cat (NTree XNode) XmlTree
 getCssAttr t a eq = css t >>> hasAttrValue a (== eq)
 
 getTorP :: ArrowXml cat => String -> cat (NTree XNode) XmlTree
@@ -226,7 +227,7 @@ parseYenPage body = do
   yen <- runX $ doc //> hasAttrValue "href" (== "/konbini.php") /> getText
   links <- runX $ (doc //> hasName "a" >>> getAttrValue "href") >>. filter isExchange
   return YenPage { yenOwned = yenToInt $ head yen
-                 , spendingLinks = [ x | Just x <- map linksToCostLinks links]
+                 , spendingLinks = mapMaybe linksToCostLinks links
                  }
     where yenToInt = read . reverse . takeWhile isDigit . reverse . filter (/= ',')
           isExchange = isInfixOf "action=exchange"

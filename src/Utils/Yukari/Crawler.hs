@@ -70,7 +70,7 @@ loggedIn s c = do
   let settings = siteSettings s
   body <- getInternalPage s c (baseSite settings)
   case body of
-    Nothing -> error $ "Failed to successfully grab the login page."
+    Nothing -> error "Failed to successfully grab the login page."
     Just body' -> do
       let b = "forums.php" `isInfixOf` body'
       unless b $ verbPrint Debug s [ "Failed to log in. username:"
@@ -113,7 +113,7 @@ crawl ys curl url = do
   case body of
     Nothing -> error $ "Failed to crawl " ++ url
     Just body' -> do
-      verbPrint Debug ys ["\n" ++ body']
+      verbPrint Debug ys ['\n' : body']
       pa@(nextPage, groups) <- parsePage ys body'
       when (logVerbosity ys >= High) (prettyPage pa)
       verbPrint Low ys ["Have", show . sum $ map (length . torrents) groups
