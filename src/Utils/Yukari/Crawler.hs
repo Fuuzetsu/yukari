@@ -9,7 +9,6 @@ import           Data.List
 import           Network.Curl
 import           Network.Curl.Download
 import           Network.HTTP hiding (password)
-import           Numeric.Natural
 import           System.Directory
 import           System.Exit
 import           System.FilePath
