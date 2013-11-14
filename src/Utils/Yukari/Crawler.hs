@@ -106,23 +106,25 @@ logonCurl ys = do
 -- session. We can obtain the appropiate session using 'logonCurl'.
 crawl :: YukariSettings -> Curl -> String -> IO ()
 crawl _ _ "" = return ()
-crawl ys curl url = do
-  let settings = siteSettings ys
-  verbPrint Low ys ["Crawling", url]
-  body <- getInternalPage ys curl url
-  case body of
-    Nothing -> error $ "Failed to crawl " ++ url
-    Just body' -> do
-      verbPrint Debug ys ['\n' : body']
-      pa@(nextPage, groups) <- parsePage ys body'
-      when (logVerbosity ys >= High) (prettyPage pa)
-      verbPrint Low ys ["Have", show . sum $ map (length . torrents) groups
-                       , "torrents pre-filter."]
-      let filtered = torrentFilter (filterFunc settings) groups
-      let tPaths = concatMap (buildTorrentPaths settings) filtered
-      verbPrint Low ys ["Have", show $ length tPaths, "torrents post-filter."]
-      mapM_ (\(fp, url') -> download fp url' ys) tPaths
-      crawl ys curl nextPage
+crawl ys curl url
+  | maxPages ys <= 0 = return ()
+  | otherwise = do
+    let settings = siteSettings ys
+    verbPrint Low ys ["Crawling", url]
+    body <- getInternalPage ys curl url
+    case body of
+      Nothing -> error $ "Failed to crawl " ++ url
+      Just body' -> do
+        verbPrint Debug ys ['\n' : body']
+        pa@(nextPage, groups) <- parsePage ys body'
+        when (logVerbosity ys >= High) (prettyPage pa)
+        verbPrint Low ys ["Have", show . sum $ map (length . torrents) groups
+                         , "torrents pre-filter."]
+        let filtered = torrentFilter (filterFunc settings) groups
+        let tPaths = concatMap (buildTorrentPaths settings) filtered
+        verbPrint Low ys ["Have", show $ length tPaths, "torrents post-filter."]
+        mapM_ (\(fp, url') -> download fp url' ys) tPaths
+        crawl (ys { maxPages = maxPages ys - 1 }) curl nextPage
 
 -- | We take settings for the site and a torrent group listing and we try to
 -- assign a file path to each torrent in the group to which the download

@@ -32,7 +32,8 @@ realMain :: Maybe YukariSettings -> IO ()
 realMain Nothing = do
   putStrLn "Please set up your ~/.yukari/Yukari.hs"
   exitFailure
-realMain (Just ys@(YukariSettings _ _ ps _ _)) = do
+realMain (Just ys) = do
+  let ps = programSettings ys
   args <- getArgs
   unless (null args) $ do
     putStrLn $ "This program currently takes no arguments. "

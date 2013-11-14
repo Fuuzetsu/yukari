@@ -10,6 +10,7 @@ data YukariSettings = YukariSettings { siteSettings :: SiteSettings
                                      , programSettings :: [ProgramSettings]
                                      , logVerbosity :: Verbosity
                                      , connectionRetries :: Integer
+                                     , maxPages :: Integer
                                      }
 
 data SiteSettings = SiteSettings { username :: String
@@ -56,6 +57,7 @@ animebytesSettings = YukariSettings
   , programSettings = []
   , logVerbosity = Low
   , connectionRetries = 3
+  , maxPages = 10
   }
 
 abSiteSettings :: SiteSettings
