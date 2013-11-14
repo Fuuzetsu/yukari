@@ -29,10 +29,6 @@ dps = Dyre.defaultParams
 
 dyreParams = Dyre.wrapMain dps
 
-
-data Hole
-hole = undefined
-
 realMain :: Maybe YukariSettings -> IO ()
 realMain Nothing = do
   putStrLn "Please set up your ~/.yukari/Yukari.hs"
