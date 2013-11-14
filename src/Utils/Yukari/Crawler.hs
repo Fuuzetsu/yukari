@@ -75,20 +75,21 @@ logonCurl s = do
     then error $ "Failed to log in as " ++ username s ++ ": " ++ show (respCurlCode r) ++ " -- " ++ respStatusLine r
     else return curl
 
-crawl :: SiteSettings -> Curl -> String -> IO ()
+crawl :: YukariSettings -> Curl -> String -> IO ()
 crawl _ _ "" = return ()
-crawl settings curl url = do
-  when (logVerbosity settings >= Low) (putStrLn $ "Crawling " ++ url)
+crawl ys curl url = do
+  let settings = siteSettings ys
+  when (logVerbosity ys >= Low) (putStrLn $ "Crawling " ++ url)
   body <- getInternalPage curl url
 
   pa@(nextPage, groups) <- parsePage body
-  when (logVerbosity settings >= High) (prettyPage pa)
-  when (logVerbosity settings >= Low) (putStrLn $ "Have " ++ show (sum (map (length . torrents) groups)) ++ " torrents pre-filter.")
+  when (logVerbosity ys >= High) (prettyPage pa)
+  when (logVerbosity ys >= Low) (putStrLn $ "Have " ++ show (sum (map (length . torrents) groups)) ++ " torrents pre-filter.")
   let filtered = torrentFilter (filterFunc settings) groups
   let all = concatMap (buildTorrentPaths settings) filtered
-  when (logVerbosity settings >= Low) (putStrLn $ "Have " ++ show (length all) ++ " torrents post-filter.")
-  mapM_ (\(fp, url) -> download fp url (logVerbosity settings) (clobberFiles settings)) all
-  crawl settings curl nextPage
+  when (logVerbosity ys >= Low) (putStrLn $ "Have " ++ show (length all) ++ " torrents post-filter.")
+  mapM_ (\(fp, url) -> download fp url (logVerbosity ys) (clobberFiles settings)) all
+  crawl ys curl nextPage
 
 buildTorrentPaths :: SiteSettings -> ABTorrentGroup -> [(Maybe FilePath, URL)]
 buildTorrentPaths set group = map (makePath &&& torrentDownloadURI) $ torrents group
@@ -99,17 +100,19 @@ buildTorrentPaths set group = map (makePath &&& torrentDownloadURI) $ torrents g
                                                                    torrentInfoSuffix tor <.> "torrent")
                                                            ]
 
-crawlFromFile :: SiteSettings -> FilePath -> IO ()
-crawlFromFile settings f = do
+crawlFromFile :: YukariSettings -> FilePath -> IO ()
+crawlFromFile ys f = do
+  let settings = siteSettings ys
   curl <- logonCurl settings
   body <- readFile f
   (n, _) <- parsePage body
-  crawl settings curl n
+  crawl ys curl n
 
-crawlFromURL :: SiteSettings -> IO ()
-crawlFromURL settings = do
+crawlFromURL :: YukariSettings -> IO ()
+crawlFromURL ys = do
+  let settings = siteSettings ys
   curl <- logonCurl settings
-  crawl settings curl $ searchSite settings
+  crawl ys curl $ searchSite settings
 
 getSinglePage :: SiteSettings -> String -> IO String
 getSinglePage settings url = logonCurl settings >>= flip getInternalPage url

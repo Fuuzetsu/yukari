@@ -8,6 +8,7 @@ import Data.Maybe
 data YukariSettings = YukariSettings { siteSettings :: SiteSettings
                                      , spendSettings :: SpendSettings
                                      , programSettings :: [ProgramSettings]
+                                     , logVerbosity :: Verbosity
                                      }
 
 data SiteSettings = SiteSettings { username :: String
@@ -16,7 +17,6 @@ data SiteSettings = SiteSettings { username :: String
                                  , loginSite :: String
                                  , searchSite :: String
                                  , topWatch :: Maybe FilePath
-                                 , logVerbosity :: Verbosity
                                  , watchFunc :: Category -> Maybe FilePath
                                  , filterFunc :: ABTorrent -> Bool
                                  , clobberFiles :: Bool
@@ -26,10 +26,11 @@ data SpendSettings = SpendSettings { yenSite :: String
                                    , yenLeftOver :: Integer
                                    }
 
-data ProgramSettings = Verbose Verbosity | DryRun | SpendYen
+data ProgramSettings = DryRun | SpendYen
                      deriving (Show, Eq)
 
-data Verbosity = Quiet | Low | High deriving (Show, Eq, Ord)
+data Verbosity = Quiet | Low | High
+               deriving (Show, Eq, Ord)
 
 minimalSettings :: String -> String -> String -> SiteSettings
 minimalSettings u p l = SiteSettings { username = u
@@ -38,7 +39,6 @@ minimalSettings u p l = SiteSettings { username = u
                                      , loginSite = l
                                      , searchSite = ""
                                      , topWatch = Nothing
-                                     , logVerbosity = Low
                                      , watchFunc = const Nothing
                                      , filterFunc = const True
                                      , clobberFiles = False
