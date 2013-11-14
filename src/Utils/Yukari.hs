@@ -32,7 +32,7 @@ dyreParams = Dyre.wrapMain dps
 
 realMain :: Maybe YukariSettings -> IO ()
 realMain Nothing = do
-  putStrLn "Got Nothing as settings. This is bad."
+  putStrLn "Please set up your ~/.yukari/Yukari.hs"
   exitFailure
 realMain (Just (YukariSettings site spend)) = do
   args <- getArgs
