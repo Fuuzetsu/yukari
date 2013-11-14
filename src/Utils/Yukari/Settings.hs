@@ -5,7 +5,10 @@ import System.FilePath
 import Data.Maybe
 
 
-data YukariSettings = YukariSettings SiteSettings SpendSettings
+data YukariSettings = YukariSettings { siteSettings :: SiteSettings
+                                     , spendSettings :: SpendSettings
+                                     , programSettings :: [ProgramSettings]
+                                     }
 
 data SiteSettings = SiteSettings { username :: String
                                  , password :: String
@@ -22,6 +25,9 @@ data SiteSettings = SiteSettings { username :: String
 data SpendSettings = SpendSettings { yenSite :: String
                                    , yenLeftOver :: Integer
                                    }
+
+data ProgramSettings = Verbose Verbosity | DryRun | SpendYen
+                     deriving (Show, Eq)
 
 data Verbosity = Quiet | Low | High deriving (Show, Eq, Ord)
 

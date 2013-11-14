@@ -30,17 +30,20 @@ dps = Dyre.defaultParams
 dyreParams = Dyre.wrapMain dps
 
 
+data Hole
+hole = undefined
+
 realMain :: Maybe YukariSettings -> IO ()
 realMain Nothing = do
   putStrLn "Please set up your ~/.yukari/Yukari.hs"
   exitFailure
-realMain (Just (YukariSettings site spend)) = do
+realMain (Just ys@(YukariSettings site spend ps)) = do
   args <- getArgs
   when (length args /= 0) $ do
     putStrLn $ "This program currently takes no arguments. "
       ++ "Populate your ~/.yukari/Yukari.hs instead"
     exitFailure
-  spendYen site spend
+  when (SpendYen `elem` ps) (spendYen ys)
 
  -- crawlFromURL $ searchSettings
  -- spendYen spendSettings
