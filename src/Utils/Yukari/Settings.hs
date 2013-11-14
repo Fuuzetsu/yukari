@@ -26,7 +26,7 @@ data SpendSettings = SpendSettings { yenSite :: String
                                    , yenLeftOver :: Integer
                                    }
 
-data ProgramSettings = DryRun | SpendYen
+data ProgramSettings = DryRun | SpendYen | DownloadTorrents
                      deriving (Show, Eq)
 
 data Verbosity = Quiet | Low | High

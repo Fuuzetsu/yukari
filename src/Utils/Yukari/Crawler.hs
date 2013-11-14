@@ -88,7 +88,7 @@ crawl ys curl url = do
   let filtered = torrentFilter (filterFunc settings) groups
   let all = concatMap (buildTorrentPaths settings) filtered
   when (logVerbosity ys >= Low) (putStrLn $ "Have " ++ show (length all) ++ " torrents post-filter.")
-  mapM_ (\(fp, url) -> download fp url (logVerbosity ys) (clobberFiles settings)) all
+  mapM_ (\(fp, url) -> download fp url ys) all
   crawl ys curl nextPage
 
 buildTorrentPaths :: SiteSettings -> ABTorrentGroup -> [(Maybe FilePath, URL)]
@@ -118,17 +118,23 @@ getSinglePage :: SiteSettings -> String -> IO String
 getSinglePage settings url = logonCurl settings >>= flip getInternalPage url
 
 
-download :: Maybe FilePath -> String -> Verbosity -> Bool -> IO ()
-download path url verb clobber =
+download :: Maybe FilePath -> String -> YukariSettings -> IO ()
+download path url ys =
+  let verb = logVerbosity ys
+      clobber = clobberFiles $ siteSettings ys
+      dry = DryRun `elem` programSettings ys
+  in
   case path of
     Nothing -> when (verb >= Low) (putStrLn "Skipping empty path.")
     Just p -> do
       b <- doesFileExist p
       when (verb >= Low && b) (putStrLn $ "Skipping already downloaded " ++ p)
-      when (clobber || not b) $ do
-        res <- openURI url
-        case res of
-          Left e -> putStrLn $ "Error " ++ e ++ " occured when downloading from " ++ url
-          Right bs -> when (verb >= Low) (putStrLn ("Downloading " ++ p)) >>
-                      createDirectoryIfMissing True (takeDirectory p) >>
-                      BS.writeFile p bs
+      if dry
+        then putStrLn $ "Dry run enabled, would download " ++ url ++ " to " ++ p ++ " otherwise."
+        else when (clobber || not b) $ do
+          res <- openURI url
+          case res of
+            Left e -> putStrLn $ "Error " ++ e ++ " occured when downloading from " ++ url
+            Right bs -> when (verb >= Low) (putStrLn ("Downloading " ++ p)) >>
+                        createDirectoryIfMissing True (takeDirectory p) >>
+                        BS.writeFile p bs

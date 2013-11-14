@@ -40,6 +40,4 @@ realMain (Just ys@(YukariSettings site spend ps v)) = do
       ++ "Populate your ~/.yukari/Yukari.hs instead"
     exitFailure
   when (SpendYen `elem` ps) (spendYen ys)
-
- -- crawlFromURL $ searchSettings
- -- spendYen spendSettings
+  when (DownloadTorrents `elem` ps) (crawlFromURL ys)
