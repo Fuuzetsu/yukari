@@ -12,17 +12,21 @@ import Control.Monad
 spendYen :: YukariSettings -> IO ()
 spendYen ys = do
   let rs = siteSettings ys
-  page <- parseYenPage =<< getSinglePage ys (yenSite $ spendSettings ys)
-  verbPrint Low ys ["Currently have", show $ yenOwned page, "yen."]
-  verbPrint High ys ["Leftover yen limit set to"
-                    , show . yenLeftOver $ spendSettings ys]
+  body <- getSinglePage ys (yenSite $ spendSettings ys)
+  case body of
+    Nothing -> putStrLn $ "Failed to fetch " ++ yenSite (spendSettings ys)
+    Just x -> do
+      page <- parseYenPage x
+      verbPrint Low ys ["Currently have", show $ yenOwned page, "yen."]
+      verbPrint High ys ["Leftover yen limit set to"
+                        , show . yenLeftOver $ spendSettings ys]
 
-  case chooseOptimal (spendSettings ys) (attachBase page) of
-    Nothing -> verbPrint Low ys ["No viable spending option found"]
-    Just (cost, link) -> do
-      verbPrint Low ys ["Spending", show cost, "yen."]
-      verbPrint High ys ["Spending the yen at", link]
-      getSinglePage ys link >> spendYen ys
+      case chooseOptimal (spendSettings ys) (attachBase page) of
+        Nothing -> verbPrint Low ys ["No viable spending option found"]
+        Just (cost, link) -> do
+          verbPrint Low ys ["Spending", show cost, "yen."]
+          verbPrint High ys ["Spending the yen at", link]
+          getSinglePage ys link >> spendYen ys
   where
     -- Attach the partial links we get from the site with
     -- the full link of the base site, adding the ‘/’ separator

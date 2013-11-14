@@ -9,6 +9,7 @@ data YukariSettings = YukariSettings { siteSettings :: SiteSettings
                                      , spendSettings :: SpendSettings
                                      , programSettings :: [ProgramSettings]
                                      , logVerbosity :: Verbosity
+                                     , connectionRetries :: Integer
                                      }
 
 data SiteSettings = SiteSettings { username :: String

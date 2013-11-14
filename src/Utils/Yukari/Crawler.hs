@@ -9,6 +9,7 @@ import           Data.List
 import           Network.Curl
 import           Network.Curl.Download
 import           Network.HTTP hiding (password)
+import           Numeric.Natural
 import           System.Directory
 import           System.Exit
 import           System.FilePath
@@ -35,12 +36,31 @@ torrentFilter p (g:gs) = let ng = g { torrents = filter p $ torrents g } in
                          if 0 /= length (torrents ng) then ng : torrentFilter p gs else torrentFilter p gs
 
 -- | Use the curl session to fetch a possibly login restricted page.
-getInternalPage :: Curl -> String -> IO String
-getInternalPage curl url = do
+getInternalPage :: YukariSettings -> Curl -> String -> IO (Maybe String)
+getInternalPage ys curl url = do
   r <- do_curl_ curl url method_GET :: IO CurlResponse
   if respCurlCode r /= CurlOK
-    then error $ "Failed to fetch: " ++ url ++ " ; " ++ show (respCurlCode r) ++ " -- " ++ respStatusLine r
-    else return $ respBody r
+    then retryFetch r $ connectionRetries ys
+    else return . Just $ respBody r
+  where
+    retryFetch :: CurlResponse -> Integer -> IO (Maybe String)
+    retryFetch r ret
+      | ret <= 0 = do
+          verbPrint Low ys [ "Failed to fetch:", url, ";"
+                           , show $ respCurlCode r, "--"
+                           , respStatusLine r
+                           ]
+          return Nothing
+      | otherwise = do
+          verbPrint High ys [ "Failed to fetch", url
+                            , show $ ret - 1
+                            , attemptFormat $ ret - 1
+                            , "remaining."
+                            ]
+          getInternalPage (ys { connectionRetries = ret - 1 }) curl url
+      where
+        attemptFormat 1 = "attempt"
+        attemptFormat _ = "attempts"
 
 -- | We check if we're banned first before we even try to log in.
 -- While it is an extra GET, we don't POST account information needlessly
@@ -59,15 +79,18 @@ banned s = do
 loggedIn :: YukariSettings -> Curl -> IO Bool
 loggedIn s c = do
   let settings = siteSettings s
-  body <- getInternalPage c (baseSite settings)
-  let b = "forums.php" `isInfixOf` body
-  unless b $ verbPrint Debug s [ "Failed to log in. username:"
-                               , username settings
-                               , "password:"
-                               , password settings
-                                 ++ "\nBody:\n" ++ body
-                               ]
-  return $ "forums.php" `isInfixOf` body
+  body <- getInternalPage s c (baseSite settings)
+  case body of
+    Nothing -> error $ "Failed to successfully grab the login page."
+    Just body' -> do
+      let b = "forums.php" `isInfixOf` body'
+      unless b $ verbPrint Debug s [ "Failed to log in. username:"
+                                   , username settings
+                                   , "password:"
+                                   , password settings
+                                     ++ "\nBody:\n" ++ body'
+                                   ]
+      return $ "forums.php" `isInfixOf` body'
 
 -- | Log in to the site.
 logonCurl :: YukariSettings -> IO Curl
@@ -97,18 +120,20 @@ crawl _ _ "" = return ()
 crawl ys curl url = do
   let settings = siteSettings ys
   verbPrint Low ys ["Crawling", url]
-  body <- getInternalPage curl url
-
-  verbPrint Debug ys ["\n" ++ body]
-  pa@(nextPage, groups) <- parsePage ys body
-  when (logVerbosity ys >= High) (prettyPage pa)
-  verbPrint Low ys ["Have", show . sum $ map (length . torrents) groups
-                   , "torrents pre-filter."]
-  let filtered = torrentFilter (filterFunc settings) groups
-  let all = concatMap (buildTorrentPaths settings) filtered
-  verbPrint Low ys ["Have", show $ length all, "torrents post-filter."]
-  mapM_ (\(fp, url) -> download fp url ys) all
-  crawl ys curl nextPage
+  body <- getInternalPage ys curl url
+  case body of
+    Nothing -> error $ "Failed to crawl " ++ url
+    Just body' -> do
+      verbPrint Debug ys ["\n" ++ body']
+      pa@(nextPage, groups) <- parsePage ys body'
+      when (logVerbosity ys >= High) (prettyPage pa)
+      verbPrint Low ys ["Have", show . sum $ map (length . torrents) groups
+                       , "torrents pre-filter."]
+      let filtered = torrentFilter (filterFunc settings) groups
+      let all = concatMap (buildTorrentPaths settings) filtered
+      verbPrint Low ys ["Have", show $ length all, "torrents post-filter."]
+      mapM_ (\(fp, url) -> download fp url ys) all
+      crawl ys curl nextPage
 
 -- | We take settings for the site and a torrent group listing and we try to
 -- assign a file path to each torrent in the group to which the download
@@ -132,8 +157,8 @@ crawlFromFile :: YukariSettings -> FilePath -> IO ()
 crawlFromFile ys f = do
   let settings = siteSettings ys
   curl <- logonCurl ys
-  body <- readFile f
-  (n, _) <- parsePage ys body
+  body' <- readFile f
+  (n, _) <- parsePage ys body'
   crawl ys curl n
 
 -- | Starts the crawl from the URL specified in the settings.
@@ -145,8 +170,8 @@ crawlFromURL ys = do
 
 -- | Logs the user in with 'logonCurl' and fetches a single page using
 -- 'getInternalPage'. Useful when we just want to grab something quickly.
-getSinglePage :: YukariSettings -> String -> IO String
-getSinglePage ys url = logonCurl ys >>= flip getInternalPage url
+getSinglePage :: YukariSettings -> String -> IO (Maybe String)
+getSinglePage ys url = logonCurl ys >>= flip (getInternalPage ys) url
 
 -- | Downloads a file to the specified location. If the file path is Nothing,
 -- the download isn't performed.
