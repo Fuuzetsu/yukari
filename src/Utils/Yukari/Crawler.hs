@@ -19,19 +19,22 @@ import           Utils.Yukari.Types
 
 type URL = String
 
+-- | 'uncurry' for triples.
 uncurry3 :: (a -> b -> c -> d) -> (a, b, c) -> d
 uncurry3 f (x, y, z) = f x y z
 
-replace :: (Eq a) => a -> a -> [a] -> [a]
+-- | Replace all occurances of an element in a list with another.
+replace :: Eq a => a -> a -> [a] -> [a]
 replace c i [] = []
 replace c i (x:xs) = if x == c then i : replace c i xs else x : replace c i xs
 
-
+-- | Filter out unwanated torrents as per specified function.
 torrentFilter :: (ABTorrent -> Bool) -> [ABTorrentGroup] -> [ABTorrentGroup]
 torrentFilter _ [] = []
 torrentFilter p (g:gs) = let ng = g { torrents = filter p $ torrents g } in
                          if 0 /= length (torrents ng) then ng : torrentFilter p gs else torrentFilter p gs
 
+-- | Use the curl session to fetch a possibly login restricted page.
 getInternalPage :: Curl -> String -> IO String
 getInternalPage curl url = do
   r <- do_curl_ curl url method_GET :: IO CurlResponse
@@ -58,7 +61,7 @@ loggedIn s c = do
   body <- getInternalPage c (baseSite s)
   return $ "forums.php" `isInfixOf` body
 
-
+-- | Log in to the site.
 logonCurl :: SiteSettings -> IO Curl
 logonCurl s = do
   b <- banned s
@@ -75,6 +78,8 @@ logonCurl s = do
     then error $ "Failed to log in as " ++ username s ++ ": " ++ show (respCurlCode r) ++ " -- " ++ respStatusLine r
     else return curl
 
+-- | Crawl the page according to user settings and using a specified curl
+-- session. We can obtain the appropiate session using 'logonCurl'.
 crawl :: YukariSettings -> Curl -> String -> IO ()
 crawl _ _ "" = return ()
 crawl ys curl url = do
@@ -92,15 +97,24 @@ crawl ys curl url = do
   mapM_ (\(fp, url) -> download fp url ys) all
   crawl ys curl nextPage
 
+-- | We take settings for the site and a torrent group listing and we try to
+-- assign a file path to each torrent in the group to which the download
+-- will be made.
 buildTorrentPaths :: SiteSettings -> ABTorrentGroup -> [(Maybe FilePath, URL)]
-buildTorrentPaths set group = map (makePath &&& torrentDownloadURI) $ torrents group
-  where makePath :: ABTorrent -> Maybe FilePath
-        makePath tor = foldl (liftA2 (</>)) (topWatch set) [ watchFunc set $ torrentCategory group
-                                                           , Just (torrentName group ++ " - " ++
-                                                                   show (torrentCategory group) ++ " ~ " ++
-                                                                   torrentInfoSuffix tor <.> "torrent")
-                                                           ]
+buildTorrentPaths set group =
+  map (makePath &&& torrentDownloadURI) $ torrents group
+  where
+    makePath :: ABTorrent -> Maybe FilePath
+    makePath tor =
+      foldl (liftA2 (</>)) (topWatch set)
+      [ watchFunc set $ torrentCategory group
+      , Just $ unwords [ torrentName group, "-"
+                       , show $ torrentCategory group, "~"
+                       , torrentInfoSuffix tor <.> "torrent"
+                       ]
+      ]
 
+-- | Starts the crawl from a saved page.
 crawlFromFile :: YukariSettings -> FilePath -> IO ()
 crawlFromFile ys f = do
   let settings = siteSettings ys
@@ -109,17 +123,23 @@ crawlFromFile ys f = do
   (n, _) <- parsePage body
   crawl ys curl n
 
+-- | Starts the crawl from the URL specified in the settings.
 crawlFromURL :: YukariSettings -> IO ()
 crawlFromURL ys = do
   let settings = siteSettings ys
   curl <- logonCurl settings
   crawl ys curl $ searchSite settings
 
+-- | Logs the user in with 'logonCurl' and fetches a single page using
+-- 'getInternalPage'. Useful when we just want to grab something quickly.
 getSinglePage :: SiteSettings -> String -> IO String
 getSinglePage settings url = logonCurl settings >>= flip getInternalPage url
 
-
-download :: Maybe FilePath -> String -> YukariSettings -> IO ()
+-- | Downloads a file to the specified location. If the file path is Nothing,
+-- the download isn't performed.
+download :: Maybe FilePath -- ^ The file to save to.
+            -> URL -- ^ The URL to download from.
+            -> YukariSettings -> IO ()
 download path url ys =
   let clobber = clobberFiles $ siteSettings ys
       dry = DryRun `elem` programSettings ys
