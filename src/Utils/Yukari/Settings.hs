@@ -1,6 +1,6 @@
 module Utils.Yukari.Settings where
 
-import Utils.Yukari.Types (Category, ABTorrent)
+import Utils.Yukari.Types (Category, ABTorrent, ABTorrentGroup)
 
 
 
@@ -20,6 +20,8 @@ data SiteSettings = SiteSettings { username :: String
                                  , watchFunc :: Category -> Maybe FilePath
                                  , filterFunc :: ABTorrent -> Bool
                                  , clobberFiles :: Bool
+                                 , groupPreprocessor :: ABTorrentGroup
+                                                        -> ABTorrentGroup
                                  }
 
 data SpendSettings = SpendSettings { yenSite :: String
@@ -42,4 +44,5 @@ minimalSettings u p l = SiteSettings { username = u
                                      , watchFunc = const Nothing
                                      , filterFunc = const True
                                      , clobberFiles = False
+                                     , groupPreprocessor = id
                                      }

@@ -219,7 +219,7 @@ parsePage ys html = do
   n <- runX $ extractNextPage doc
   gs <- runX $ extractTorrentGroups doc ys
   let next = if null n then "" else site ++ "/" ++ head n
-  return (next, gs)
+  return (next, map (groupPreprocessor $ siteSettings ys) gs)
 
 parseYenPage :: String -> IO YenPage
 parseYenPage body = do
