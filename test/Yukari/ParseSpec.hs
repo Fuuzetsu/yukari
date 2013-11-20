@@ -80,6 +80,62 @@ spec = do
     it "should not find any anime" $ do
       countCategory Anime `pShouldReturn` 0
 
+    it "should find two torrents with softsubs" $ do
+      countSub softSub `pShouldReturn` 2
+
+    it "should find three torrents with hardsubs" $ do
+      countSub hardSub `pShouldReturn` 3
+
+    it "should find one torrent with softsubs by WiKi" $ do
+      countSub (== Softsub "WiKi") `pShouldReturn` 1
+
+    it "should find two torrents with hardsubs by sars" $ do
+      countSub (== Hardsub "sars") `pShouldReturn` 2
+
+    it "should find one torrent with hardsubs by d-addicts" $ do
+      countSub (== Hardsub "d-addicts") `pShouldReturn` 1
+
+    it "should find one torrent with softsubs by d-addicts" $ do
+      countSub (== Softsub "d-addicts") `pShouldReturn` 1
+
+    it "should find one torrent with softsubs by an unspecified group" $ do
+      countSub (== Softsub "") `pShouldReturn` 1
+
+    it "should find three torrents with MP3 audio" $ do
+      countAudio (== MP3) `pShouldReturn` 3
+
+    it "should find two torrents with AAC audio" $ do
+      countAudio (== AAC) `pShouldReturn` 2
+
+    it "should find one torrent with DTS 5.1 audio" $ do
+      countAudio (== OtherAudio "DTS 5.1") `pShouldReturn` 1
+
     where
+      softSub (Softsub _) = True
+      softSub _ = False
+
+      hardSub (Hardsub _) = True
+      hardSub _ = False
+
       count x = length . elemIndices x
       countCategory x = count x . map torrentCategory . snd
+
+      getInfo = map torrentInfo . concatMap torrents . snd
+
+      getAudio p = audio' p . getInfo
+        where
+          audio' :: (Audio -> Bool) -> [Information] -> [Audio]
+          audio' p info =
+            let audioInfo  = [ audio x | AnimeInformation x <- info ]
+            in filter p audioInfo
+
+      countAudio p = length . getAudio p
+
+      getSubs p = subs p . getInfo
+        where
+          subs :: (Subtitles -> Bool) -> [Information] -> [Subtitles]
+          subs p info =
+            let aniInfo = [ subtitles x | AnimeInformation x <- info ]
+            in filter p aniInfo
+
+      countSub p = length . getSubs p
