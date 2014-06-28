@@ -1,7 +1,8 @@
-{-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
+{-# LANGUAGE Arrows, OverloadedStrings, LambdaCase #-}
 
 module Utils.Yukari.Parser (parsePage, parseYenPage) where
 
+import Control.Applicative
 import qualified Data.Attoparsec.Text as A
 import           Data.Char
 import           Data.Maybe (mapMaybe)
@@ -61,7 +62,7 @@ parseAudio s
     dts [] = Nothing
     dts s@(_:xs)
       | "| DTS " `isPrefixOf` s = Just . DTS . takeWhile (/= ' ') $
-                                    drop (length "| DTS ") s
+                                    drop (length ("| DTS " :: String)) s
       | otherwise = dts xs
 
 parseFormat :: String -> ReleaseFormat
@@ -108,13 +109,17 @@ stripeq = stripeg '='
 stripID :: String -> Integer
 stripID = read . stripeq
 
-
 parseResolution :: String -> Resolution
-parseResolution s
-  | "| 1080p |" `isInfixOf` s = Resolution 1920 1080
-  | "| 720p |" `isInfixOf` s = Resolution 1280 720
-  | otherwise = uncurry Resolution $ extractRes s
-  where extractRes x = (\t -> ((read $ filter isDigit $ head t), (read $ filter isDigit $ last t))) $ map unpack $ split (== 'x') $ pack $ head $ filter (isInfixOf "x") (splitInfo x)
+parseResolution s = case A.parseOnly r $ pack s of
+  Left _ -> Resolution 0 0
+  Right r -> r
+  where
+    r :: A.Parser Resolution
+    r = pp <|> reg <|> (A.anyChar *> r)
+    pp = "480p" *> return (Resolution 640 480)
+         <|> "720p" *> return (Resolution 1280 720)
+         <|> "1080p" *> return (Resolution 1920 1080)
+    reg = Resolution <$> A.decimal <* "x" <*> A.decimal
 
 splitInfo :: String -> [String]
 splitInfo x = filter (not . null) $ map (dropSpaces . unpack) (split (== '|') (pack x))
