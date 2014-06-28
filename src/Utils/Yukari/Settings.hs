@@ -23,7 +23,7 @@ data SiteSettings = SiteSettings { username :: String
                                  , filterFunc :: ABTorrent -> Bool
                                  , clobberFiles :: Bool
                                  , groupPreprocessor :: ABTorrentGroup
-                                                        -> ABTorrentGroup
+                                                     -> ABTorrentGroup
                                  }
 
 data SpendSettings = SpendSettings { yenSite :: String

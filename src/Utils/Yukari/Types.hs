@@ -20,7 +20,7 @@ data ABTorrent = ABTorrent { torrentID :: Integer
 
 
 data ABTorrentGroup = ABTorrentGroup { torrentName :: String
-                                     , torrentCategory :: Category
+                                     , torrentCategory :: Maybe Category
                                      --, torrentSynonyms :: String
                                      --, torrentSnatches :: Integer
                                      --, torrentComments :: Integer
@@ -35,11 +35,11 @@ data ABTorrentGroup = ABTorrentGroup { torrentName :: String
 
 data Information = AnimeInformation AnimeInfo | MangaInformation MangaInfo | NoInfo deriving (Show, Eq)
 
-data AnimeInfo = AnimeInfo { releaseFormat :: ReleaseFormat
-                           , videoContainer :: AnimeContainer
-                           , animeCodec :: AnimeCodec
+data AnimeInfo = AnimeInfo { releaseFormat :: Maybe ReleaseFormat
+                           , videoContainer :: Maybe AnimeContainer
+                           , animeCodec :: Maybe AnimeCodec
                            , subtitles :: Subtitles
-                           , resolution :: Resolution
+                           , resolution :: Maybe Resolution
                            , audio :: Audio
                            --, dualAudio :: Bool
                            } deriving (Show, Eq)
@@ -51,7 +51,7 @@ data MangaInfo = MangaInfo { scanlated :: Bool
 
 
 data ReleaseFormat = DVD | Bluray | TV | Web | VHS | LD deriving (Read, Show, Eq)
-data AnimeContainer = MKV | MP4 | ISO | WMV | AVI | VOB | OGM deriving (Read, Show, Eq)
+data AnimeContainer = MKV | MP4 | ISO | WMV | AVI | VOB | OGM | M2TS deriving (Read, Show, Eq)
 data AnimeCodec = H264 | H264HI10P | XviD | DivX | WMV_ | DVD5 | DVD9  deriving (Read, Show, Eq)
 data Subtitles = Hardsub String | Softsub String | RAW | UnknownSubs deriving (Show, Eq)
 data Resolution = Resolution Integer Integer deriving (Show, Eq)

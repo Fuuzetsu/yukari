@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 module Utils.Yukari.Crawler (crawlFromURL, crawlFromFile, getSinglePage) where
 
 import           Control.Applicative
@@ -21,8 +22,10 @@ type URL = String
 -- | Filter out unwanated torrents as per specified function.
 torrentFilter :: (ABTorrent -> Bool) -> [ABTorrentGroup] -> [ABTorrentGroup]
 torrentFilter _ [] = []
-torrentFilter p (g:gs) = let ng = g { torrents = filter p $ torrents g } in
-                         if 0 /= length (torrents ng) then ng : torrentFilter p gs else torrentFilter p gs
+torrentFilter p (g:gs) = let ng = g { torrents = filter p $ torrents g }
+                         in case torrents ng of
+                           [] -> torrentFilter p gs
+                           _ -> ng : torrentFilter p gs
 
 -- | Use the curl session to fetch a possibly login restricted page.
 getInternalPage :: YukariSettings -> Curl -> String -> IO (Maybe String)
@@ -134,14 +137,16 @@ buildTorrentPaths set g =
   map (makePath &&& torrentDownloadURI) $ torrents g
   where
     makePath :: ABTorrent -> Maybe FilePath
-    makePath tor =
-      foldl (liftA2 (</>)) (topWatch set)
-      [ watchFunc set $ torrentCategory g
-      , Just $ unwords [ torrentName g, "-"
-                       , show $ torrentCategory g, "~"
-                       , torrentInfoSuffix tor <.> "torrent"
-                       ]
-      ]
+    makePath tor = case torrentCategory g of
+      Nothing -> Nothing
+      Just cat -> foldl (liftA2 (</>)) (topWatch set)
+                  [ watchFunc set cat
+                  , Just $ unwords [ torrentName g, "-"
+                                   , show cat
+                                   , "~"
+                                   , torrentInfoSuffix tor <.> "torrent"
+                                   ]
+                  ]
 
 -- | Starts the crawl from a saved page.
 crawlFromFile :: YukariSettings -> FilePath -> IO ()
@@ -180,12 +185,10 @@ download path url ys =
       if dry
         then verbPrint Debug ys [ "Dry run enabled, would download", url
                                 , "to", p, "otherwise."]
-        else when (clobber || not b) $ do
-          res <- openURI url
-          case res of
-            Left e -> putStrLn $
-                      unwords [ "Error ", e, " occured when downloading from "
-                              , url]
-            Right bs -> verbPrint Low ys ["Downloading ", p]
-                        >> createDirectoryIfMissing True (takeDirectory p)
-                        >> BS.writeFile p bs
+        else when (clobber || not b) $ openURI url >>= \case
+          Left e -> putStrLn $ unwords [ "Error ", e
+                                       , " occured when downloading from "
+                                       , url]
+          Right bs -> verbPrint Low ys ["Downloading ", p]
+                      >> createDirectoryIfMissing True (takeDirectory p)
+                      >> BS.writeFile p bs

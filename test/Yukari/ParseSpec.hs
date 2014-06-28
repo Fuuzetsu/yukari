@@ -7,7 +7,6 @@ import Data.List
 import Utils.Yukari.Parser
 import Utils.Yukari.Settings
 import Utils.Yukari.Types
-import System.Directory
 import System.FilePath
 import Test.Hspec
 
@@ -50,10 +49,12 @@ readHtml = readFile $ testDir </> "simple.html"
 main :: IO ()
 main = hspec spec
 
+parse :: IO (String, [ABTorrentGroup])
+parse = readHtml >>= parsePage yukariSettings
+
 spec :: Spec
 spec = do
-  let parse = readHtml >>= parsePage yukariSettings
-      f `pShouldReturn` x = f <$> parse `shouldReturn` x
+  let f `pShouldReturn` x = f <$> parse `shouldReturn` x
 
   describe "when parsing an example torrent search page" $ do
     it "parses the right amount of groups" $ do
@@ -66,19 +67,19 @@ spec = do
       fst <$> parse `shouldReturn` ""
 
     it "parses the right amount of oneshots" $ do
-      countCategory (Manga Oneshot) `pShouldReturn` 2
+      countCategory (Just $ Manga Oneshot) `pShouldReturn` 2
 
     it "parses the right amount of live action movies" $ do
-      countCategory LiveAction `pShouldReturn` 1
+      countCategory (Just LiveAction) `pShouldReturn` 1
 
     it "parses the right amount of live action series" $ do
-      countCategory LiveActionSeries `pShouldReturn` 2
+      countCategory (Just LiveActionSeries) `pShouldReturn` 2
 
     it "parses the right amount of manga" $ do
-      countCategory (Manga GenericManga) `pShouldReturn` 2
+      countCategory (Just $ Manga GenericManga) `pShouldReturn` 2
 
     it "should not find any anime" $ do
-      countCategory Anime `pShouldReturn` 0
+      countCategory (Just Anime) `pShouldReturn` 0
 
     it "should find two torrents with softsubs" $ do
       countSub softSub `pShouldReturn` 3
@@ -118,6 +119,7 @@ spec = do
       hardSub _ = False
 
       count x = length . elemIndices x
+
       countCategory x = count x . map torrentCategory . snd
 
       getInfo = map torrentInfo . concatMap torrents . snd
@@ -125,17 +127,17 @@ spec = do
       getAudio p = audio' p . getInfo
         where
           audio' :: (Audio -> Bool) -> [Information] -> [Audio]
-          audio' p info =
+          audio' p' info =
             let audioInfo  = [ audio x | AnimeInformation x <- info ]
-            in filter p audioInfo
+            in filter p' audioInfo
 
       countAudio p = length . getAudio p
 
       getSubs p = subs p . getInfo
         where
           subs :: (Subtitles -> Bool) -> [Information] -> [Subtitles]
-          subs p info =
+          subs p' info =
             let aniInfo = [ subtitles x | AnimeInformation x <- info ]
-            in filter p aniInfo
+            in filter p' aniInfo
 
       countSub p = length . getSubs p
