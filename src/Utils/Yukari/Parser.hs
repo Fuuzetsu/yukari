@@ -2,7 +2,7 @@
 
 module Utils.Yukari.Parser (parsePage, parseYenPage) where
 
--- import qualified Data.Attoparsec.Text as A
+import qualified Data.Attoparsec.Text as A
 import           Data.Char
 import           Data.Maybe (mapMaybe)
 import           Data.List
@@ -14,13 +14,14 @@ import           Utils.Yukari.Settings
 import           Utils.Yukari.Types
 
 parseAnimeInfo :: String -> Information
-parseAnimeInfo info = AnimeInformation AnimeInfo { releaseFormat = parseFormat info
-                                                 , videoContainer = parseContainer info
-                                                 , animeCodec = parseCodec info
-                                                 , subtitles = parseSubs info
-                                                 , resolution = parseResolution info
-                                                 , audio = parseAudio info
-                                                 }
+parseAnimeInfo info =
+  AnimeInformation AnimeInfo { releaseFormat = parseFormat info
+                             , videoContainer = parseContainer info
+                             , animeCodec = parseCodec info
+                             , subtitles = parseSubs info
+                             , resolution = parseResolution info
+                             , audio = parseAudio info
+                             }
 
 parseCodec :: String -> AnimeCodec
 parseCodec info
@@ -32,10 +33,11 @@ parseCodec info
   where c = dropSpaces $ splitInfo info !! 2
 
 parseMangaInfo :: String -> Information
-parseMangaInfo info = MangaInformation MangaInfo { scanlated = "Scanlated" `isInfixOf` info
-                                                 , archived = not $ "Unarchived" `isInfixOf` info
-                                                 , ongoing = "Ongoing" `isInfixOf` info
-                                                 }
+parseMangaInfo info =
+  MangaInformation MangaInfo { scanlated = "Scanlated" `isInfixOf` info
+                             , archived = not $ "Unarchived" `isInfixOf` info
+                             , ongoing = "Ongoing" `isInfixOf` info
+                             }
 
 parseContainer :: String -> AnimeContainer
 parseContainer info
@@ -75,22 +77,26 @@ parseSubs info
   | "Hardsubs" `isInfixOf` sub = Hardsub $ extractParens sub
   | otherwise = UnknownSubs
   where sub = extractSubs info
-        extractParens x = if '(' `elem` x then init $ tail $ dropWhile (/= '(') x else ""
+        extractParens x = if '(' `elem` x
+                          then init $ tail $ dropWhile (/= '(') x
+                          else ""
 
 anyInfix :: String -> [String] -> Bool
 anyInfix x l = True `elem` [b `isInfixOf` x | b <- l]
 
 extractSubs :: String -> String
-extractSubs x = last $ filter (`anyInfix` ["Hardsubs", "Softsubs", "RAW"]) (splitInfo x)
+extractSubs x =
+  last $ filter (`anyInfix` ["Hardsubs", "Softsubs", "RAW"]) (splitInfo x)
 
 splitsize :: String -> (Double, String)
 splitsize s = ((read $ head as) :: Double, head $ tail as)
     where as = map unpack $ split (== ' ') (pack s)
 
 sizeToBytes :: String -> Integer
-sizeToBytes size = round $ s * 1024 ^ (getExp m :: Integer)
-                    where (s, m) = splitsize $ delete ',' size
-                          getExp n = fst $ head $ filter (\(_, u) -> n == u) (zip [0, 1..] ["B", "KB", "MB", "GB", "TB", "PB"])
+sizeToBytes size = round $ s * 1024 ^ getExp m
+  where (s, m) = splitsize $ delete ',' size
+        getExp n = fst . head . filter (\(_, u) -> n == u) $
+                     zip [0, 1..] ["B", "KB", "MB" , "GB", "TB", "PB"]
 
 
 stripeg :: Char -> String -> String
@@ -107,9 +113,8 @@ parseResolution :: String -> Resolution
 parseResolution s
   | "| 1080p |" `isInfixOf` s = Resolution 1920 1080
   | "| 720p |" `isInfixOf` s = Resolution 1280 720
-  | otherwise = uncurry Resolution ext
-  where extractRes x = (\t -> ((read $ filter isDigit $ head t) :: Integer, (read $ filter isDigit $ last t) :: Integer)) $ map unpack $ split (== 'x') $ pack $ head $ filter (isInfixOf "x") (splitInfo x)
-        ext = extractRes s
+  | otherwise = uncurry Resolution $ extractRes s
+  where extractRes x = (\t -> ((read $ filter isDigit $ head t), (read $ filter isDigit $ last t))) $ map unpack $ split (== 'x') $ pack $ head $ filter (isInfixOf "x") (splitInfo x)
 
 splitInfo :: String -> [String]
 splitInfo x = filter (not . null) $ map (dropSpaces . unpack) (split (== '|') (pack x))
