@@ -125,10 +125,7 @@ splitInfo :: String -> [String]
 splitInfo x = filter (not . null) $ map (dropSpaces . unpack) (split (== '|') (pack x))
 
 dropSpaces :: String -> String
-dropSpaces "" = ""
-dropSpaces " " = ""
-dropSpaces s = let x = if head s == ' ' then tail s else s in
-               if last x == ' ' then init x else x
+dropSpaces = concat . words
 
 procSuff :: String -> String
 procSuff suff = if " | " `isPrefixOf` reverse suff then reverse $ drop 3 $ reverse suff else suff
