@@ -5,7 +5,7 @@ module Utils.Yukari.Parser (parsePage, parseYenPage) where
 import Control.Applicative
 import qualified Data.Attoparsec.Text as A
 import           Data.Char
-import           Data.Maybe (mapMaybe)
+import           Data.Maybe (mapMaybe, fromMaybe)
 import           Data.List
 import           Data.Text (pack, unpack, split)
 import           Data.Tree.NTree.TypeDefs
@@ -54,9 +54,7 @@ parseAudio s
   | "| AAC" `isInfixOf` s = AAC
   | "| AC" `isInfixOf` s = AC
   | "| PCM" `isInfixOf` s = MP3
-  | otherwise = case dts s of
-    Nothing -> OtherAudio s
-    Just d -> d
+  | otherwise = fromMaybe (OtherAudio s) $ dts s
   where
     dts :: String -> Maybe Audio
     dts [] = Nothing
@@ -83,14 +81,14 @@ parseSubs info
                           else ""
 
 anyInfix :: String -> [String] -> Bool
-anyInfix x l = True `elem` [b `isInfixOf` x | b <- l]
+anyInfix x = any (`isInfixOf` x)
 
 extractSubs :: String -> String
 extractSubs x =
   last $ filter (`anyInfix` ["Hardsubs", "Softsubs", "RAW"]) (splitInfo x)
 
 splitsize :: String -> (Double, String)
-splitsize s = ((read $ head as) :: Double, head $ tail as)
+splitsize s = (read $ head as, head $ tail as)
     where as = map unpack $ split (== ' ') (pack s)
 
 sizeToBytes :: String -> Integer
