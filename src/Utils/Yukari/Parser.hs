@@ -1,4 +1,4 @@
-{-# LANGUAGE Arrows, NoMonomorphismRestriction, OverloadedStrings #-}
+{-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
 
 module Utils.Yukari.Parser (parsePage, parseYenPage) where
 
@@ -51,7 +51,16 @@ parseAudio s
   | "| AAC" `isInfixOf` s = AAC
   | "| AC" `isInfixOf` s = AC
   | "| PCM" `isInfixOf` s = MP3
-  | otherwise = OtherAudio s
+  | otherwise = case dts s of
+    Nothing -> OtherAudio s
+    Just d -> d
+  where
+    dts :: String -> Maybe Audio
+    dts [] = Nothing
+    dts s@(_:xs)
+      | "| DTS " `isPrefixOf` s = Just . DTS . takeWhile (/= ' ') $
+                                    drop (length "| DTS ") s
+      | otherwise = dts xs
 
 parseFormat :: String -> ReleaseFormat
 parseFormat info
@@ -63,7 +72,7 @@ parseSubs :: String -> Subtitles
 parseSubs info
   | "RAW" `isInfixOf` sub = RAW
   | "Softsubs" `isInfixOf` sub = Softsub $ extractParens sub
-  | "Hardsubs" `isInfixOf` sub = Softsub $ extractParens sub
+  | "Hardsubs" `isInfixOf` sub = Hardsub $ extractParens sub
   | otherwise = UnknownSubs
   where sub = extractSubs info
         extractParens x = if '(' `elem` x then init $ tail $ dropWhile (/= '(') x else ""
@@ -164,9 +173,14 @@ getTorrent ys =
         tlchr <- deep getText <<< getTorP "torrent_leechers" -< x
         tsdr <- deep getText <<< getTorP "torrent_seeders" -< x
         tsize <- deep getText <<< getTorP "torrent_size" -< x
-        returnA -< ABTorrent { torrentID = read $ stripeg '_' tID, torrentURI = mainpage ++ "/" ++ tLink, torrentDownloadURI = mainpage ++ "/" ++ tDown
-                             , torrentInfoSuffix = procSuff tInfSuf, torrentInfo = NoInfo, torrentSnatched = read tstch
-                             , torrentLeechers = read tlchr, torrentSeeders = read tsdr, torrentSize =  sizeToBytes tsize
+        returnA -< ABTorrent { torrentID = read $ stripeg '_' tID
+                             , torrentURI = mainpage ++ "/" ++ tLink
+                             , torrentDownloadURI = mainpage ++ "/" ++ tDown
+                             , torrentInfoSuffix = procSuff tInfSuf
+                             , torrentInfo = NoInfo, torrentSnatched = read tstch
+                             , torrentLeechers = read tlchr
+                             , torrentSeeders = read tsdr
+                             , torrentSize =  sizeToBytes tsize
                              }
 
 
@@ -185,8 +199,12 @@ extractTorrentGroups doc ys = doc //> css "div" >>> havp "class" "group_cont" >>
     tags <- listA $ css "a" ! "href" <<< hasAttrValue "class" (== "tags_sm")
             <<< multi (hasName "div") -< x
     tors <- listA (getTorrent ys) <<< hasAttrValue "class" (== "torrent_group") <<< multi (hasName "table") -< x
-    returnA -< ABTorrentGroup { torrentName = title, torrentCategory = parseCategory cat, seriesID = stripID serID
-                              , groupID = stripID grID, torrentImageURI = img, torrentTags = map stripeq tags
+    returnA -< ABTorrentGroup { torrentName = title
+                              , torrentCategory = parseCategory cat
+                              , seriesID = stripID serID
+                              , groupID = stripID grID
+                              , torrentImageURI = img
+                              , torrentTags = map stripeq tags
                               , torrents = map (\x' -> attachInfo x' $ parseInfo (parseCategory cat) (torrentInfoSuffix x')) tors
                               }
   where
@@ -196,6 +214,8 @@ extractTorrentGroups doc ys = doc //> css "div" >>> havp "class" "group_cont" >>
 
 parseInfo :: Category -> String -> Information
 parseInfo Anime suf = parseAnimeInfo suf
+parseInfo LiveAction suf = parseAnimeInfo suf
+parseInfo LiveActionSeries suf = parseAnimeInfo suf
 parseInfo (Manga _) suf = parseMangaInfo suf
 parseInfo _ _ = NoInfo
 

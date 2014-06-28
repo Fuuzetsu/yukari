@@ -81,7 +81,7 @@ spec = do
       countCategory Anime `pShouldReturn` 0
 
     it "should find two torrents with softsubs" $ do
-      countSub softSub `pShouldReturn` 2
+      countSub softSub `pShouldReturn` 3
 
     it "should find three torrents with hardsubs" $ do
       countSub hardSub `pShouldReturn` 3
@@ -108,7 +108,7 @@ spec = do
       countAudio (== AAC) `pShouldReturn` 2
 
     it "should find one torrent with DTS 5.1 audio" $ do
-      countAudio (== OtherAudio "DTS 5.1") `pShouldReturn` 1
+      countAudio (== DTS "5.1") `pShouldReturn` 1
 
     where
       softSub (Softsub _) = True

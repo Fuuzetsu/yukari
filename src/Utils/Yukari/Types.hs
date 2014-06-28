@@ -52,10 +52,10 @@ data MangaInfo = MangaInfo { scanlated :: Bool
 
 data ReleaseFormat = DVD | Bluray | TV | Web | VHS | LD deriving (Read, Show, Eq)
 data AnimeContainer = MKV | MP4 | ISO | WMV | AVI | VOB | OGM deriving (Read, Show, Eq)
-data AnimeCodec = H264 | H264HI10P | XviD | DivX | WMV_ | DVD5 | DVD9 deriving (Read, Show, Eq)
+data AnimeCodec = H264 | H264HI10P | XviD | DivX | WMV_ | DVD5 | DVD9  deriving (Read, Show, Eq)
 data Subtitles = Hardsub String | Softsub String | RAW | UnknownSubs deriving (Show, Eq)
 data Resolution = Resolution Integer Integer deriving (Show, Eq)
-data Audio = MP3 | FLAC | AAC | AC | PCM | OtherAudio String deriving (Show, Eq)
+data Audio = MP3 | FLAC | AAC | AC | PCM | DTS String | OtherAudio String deriving (Show, Eq)
 data MusicCategory = Single | Soundtrack | MusicDVD | Live | EP | RemixCD
                    | PV | LiveAlbum | Compilation | Album | DramaCD deriving (Read, Show, Eq)
 data MangaCategory = GenericManga | Manhua | Manhwa | OEL | Oneshot deriving (Read, Show, Eq)
