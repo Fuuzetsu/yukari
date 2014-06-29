@@ -1,89 +1,95 @@
+{-# LANGUAGE TemplateHaskell #-}
 module Utils.Yukari.Settings where
 
+import Control.Lens
 import Data.List (isPrefixOf)
 import Utils.Yukari.Types
 
 
 
-data YukariSettings = YukariSettings { siteSettings :: SiteSettings
-                                     , spendSettings :: SpendSettings
-                                     , programSettings :: [ProgramSettings]
-                                     , logVerbosity :: Verbosity
-                                     , connectionRetries :: Integer
-                                     , maxPages :: Integer
+data YukariSettings = YukariSettings { _siteSettings :: SiteSettings
+                                     , _spendSettings :: SpendSettings
+                                     , _programSettings :: [ProgramSettings]
+                                     , _logVerbosity :: Verbosity
+                                     , _connectionRetries :: Integer
+                                     , _maxPages :: Integer
                                      }
 
-data SiteSettings = SiteSettings { username :: String
-                                 , password :: String
-                                 , baseSite :: String
-                                 , loginSite :: String
-                                 , searchSite :: String
-                                 , topWatch :: Maybe FilePath
-                                 , watchFunc :: Category -> Maybe FilePath
-                                 , filterFunc :: ABTorrent -> Bool
-                                 , clobberFiles :: Bool
-                                 , groupPreprocessor :: ABTorrentGroup
-                                                     -> ABTorrentGroup
+data SiteSettings = SiteSettings { _username :: String
+                                 , _password :: String
+                                 , _baseSite :: String
+                                 , _loginSite :: String
+                                 , _searchSite :: String
+                                 , _topWatch :: Maybe FilePath
+                                 , _watchFunc :: Category -> Maybe FilePath
+                                 , _filterFunc :: ABTorrent -> Bool
+                                 , _clobberFiles :: Bool
+                                 , _groupPreprocessor :: ABTorrentGroup
+                                                      -> ABTorrentGroup
                                  }
 
-data SpendSettings = SpendSettings { yenSite :: String
-                                   , yenLeftOver :: Integer
+data SpendSettings = SpendSettings { _yenSite :: String
+                                   , _yenLeftOver :: Integer
                                    }
-
 data ProgramSettings = DryRun | SpendYen | DownloadTorrents
                      deriving (Show, Eq)
 
 data Verbosity = Quiet | Low | High | Debug
                deriving (Show, Eq, Ord)
 
+
+makeLenses ''YukariSettings
+makeLenses ''SiteSettings
+makeLenses ''SpendSettings
+
+
 minimalSettings :: String -> String -> String -> SiteSettings
-minimalSettings u p l = SiteSettings { username = u
-                                     , password = p
-                                     , baseSite = ""
-                                     , loginSite = l
-                                     , searchSite = ""
-                                     , topWatch = Nothing
-                                     , watchFunc = const Nothing
-                                     , filterFunc = const True
-                                     , clobberFiles = False
-                                     , groupPreprocessor = id
+minimalSettings u p l = SiteSettings { _username = u
+                                     , _password = p
+                                     , _baseSite = ""
+                                     , _loginSite = l
+                                     , _searchSite = ""
+                                     , _topWatch = Nothing
+                                     , _watchFunc = const Nothing
+                                     , _filterFunc = const True
+                                     , _clobberFiles = False
+                                     , _groupPreprocessor = id
                                      }
 
 -- | Some defaults for the current AnimeBytes site
 animebytesSettings :: YukariSettings
 animebytesSettings = YukariSettings
-  { siteSettings = abSiteSettings
-  , spendSettings = abSpendSettings
-  , programSettings = []
-  , logVerbosity = Low
-  , connectionRetries = 3
-  , maxPages = 10
+  { _siteSettings = abSiteSettings
+  , _spendSettings = abSpendSettings
+  , _programSettings = []
+  , _logVerbosity = Low
+  , _connectionRetries = 3
+  , _maxPages = 10
   }
 
 abSiteSettings :: SiteSettings
 abSiteSettings = SiteSettings
-  { username = ""
-  , password = ""
-  , baseSite = "https://animebytes.tv"
-  , loginSite = "https://animebytes.tv/login.php"
-  , searchSite = "https://animebytes.tv/torrents.php"
-  , topWatch = Nothing
-  , watchFunc = const Nothing
-  , filterFunc = const False
-  , clobberFiles = False
-  , groupPreprocessor = fixImageLinks
+  { _username = ""
+  , _password = ""
+  , _baseSite = "https://animebytes.tv"
+  , _loginSite = "https://animebytes.tv/login.php"
+  , _searchSite = "https://animebytes.tv/torrents.php"
+  , _topWatch = Nothing
+  , _watchFunc = const Nothing
+  , _filterFunc = const False
+  , _clobberFiles = False
+  , _groupPreprocessor = fixImageLinks
   }
   where
     -- Images nowadays seem to start with this weird link that can't be accessed
     -- from a browser unless we're on the page already and directly click on it.
     -- We fix that here.
     fixImageLinks :: ABTorrentGroup -> ABTorrentGroup
-    fixImageLinks g = let img = torrentImageURI g
-                      in if "//" `isPrefixOf`img
-                         then g { torrentImageURI = "https:" ++ img }
-                         else g
+    fixImageLinks = torrentImageURI %~ \i -> if "//" `isPrefixOf` i
+                                             then "https" ++ i
+                                             else i
 
 abSpendSettings :: SpendSettings
-abSpendSettings = SpendSettings { yenSite = "https://animebytes.tv/konbini.php"
-                                , yenLeftOver = 0
+abSpendSettings = SpendSettings { _yenSite = "https://animebytes.tv/konbini.php"
+                                , _yenLeftOver = 0
                                 }

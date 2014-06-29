@@ -4,6 +4,7 @@ module Utils.Yukari.Parser (parsePage, parseYenPage) where
 
 
 import           Control.Applicative
+import           Control.Lens hiding (deep)
 import qualified Data.Attoparsec.Text as A
 import           Data.Char
 import           Data.List
@@ -19,12 +20,12 @@ import           Utils.Yukari.Types
 
 parseAnimeInfo :: String -> Information
 parseAnimeInfo info =
-  AnimeInformation AnimeInfo { releaseFormat = parseFormat info
-                             , videoContainer = parseContainer info
-                             , animeCodec = parseCodec info
-                             , subtitles = parseSubs info
-                             , resolution = parseResolution info
-                             , audio = parseAudio info
+  AnimeInformation AnimeInfo { _releaseFormat = parseFormat info
+                             , _videoContainer = parseContainer info
+                             , _animeCodec = parseCodec info
+                             , _subtitles = parseSubs info
+                             , _resolution = parseResolution info
+                             , _audio = parseAudio info
                              }
 
 parseCodec :: String -> Maybe AnimeCodec
@@ -42,9 +43,9 @@ parseCodec info =
 
 parseMangaInfo :: String -> Information
 parseMangaInfo info =
-  MangaInformation MangaInfo { scanlated = "Scanlated" `isInfixOf` info
-                             , archived = not $ "Unarchived" `isInfixOf` info
-                             , ongoing = "Ongoing" `isInfixOf` info
+  MangaInformation MangaInfo { _scanlated = "Scanlated" `isInfixOf` info
+                             , _archived = not $ "Unarchived" `isInfixOf` info
+                             , _ongoing = "Ongoing" `isInfixOf` info
                              }
 
 parseContainer :: String -> Maybe AnimeContainer
@@ -110,6 +111,7 @@ splitsize s = (read $ head as, head $ tail as)
 sizeToBytes :: String -> Integer
 sizeToBytes size = round $ s * 1024 ^ getExp m
   where (s, m) = splitsize $ delete ',' size
+        getExp :: String -> Int
         getExp n = fst . head . filter (\(_, u) -> n == u) $
                      zip [0, 1..] ["B", "KB", "MB" , "GB", "TB", "PB"]
 
@@ -192,19 +194,19 @@ getTorrent ys =
       tlchr <- deep getText <<< getTorP "torrent_leechers" -< x
       tsdr <- deep getText <<< getTorP "torrent_seeders" -< x
       tsize <- deep getText <<< getTorP "torrent_size" -< x
-      returnA -< ABTorrent { torrentID = read $ stripeg '_' tID
-                           , torrentURI = mainpage ++ "/" ++ tLink
-                           , torrentDownloadURI = mainpage ++ "/" ++ tDown
-                           , torrentInfoSuffix = tInfSuf
-                           , torrentInfo = NoInfo
-                           , torrentSnatched = read tstch
-                           , torrentLeechers = read tlchr
-                           , torrentSeeders = read tsdr
-                           , torrentSize =  sizeToBytes tsize
+      returnA -< ABTorrent { _torrentID = read $ stripeg '_' tID
+                           , _torrentURI = mainpage tLink
+                           , _torrentDownloadURI = mainpage tDown
+                           , _torrentInfoSuffix = tInfSuf
+                           , _torrentInfo = Nothing
+                           , _torrentSnatched = read tstch
+                           , _torrentLeechers = read tlchr
+                           , _torrentSeeders = read tsdr
+                           , _torrentSize = sizeToBytes tsize
                            }
   where
     infixIds x = "php?id=" `isInfixOf` x && "torrentid=" `isInfixOf` x
-    mainpage = baseSite $ siteSettings ys
+    mainpage x = ys ^. siteSettings . baseSite ++ "/" ++ x
 
 extractTorrentGroups
   :: ArrowXml cat =>
@@ -224,29 +226,27 @@ extractTorrentGroups doc ys =
     tors <- listA (getTorrent ys) <<< hasAttrValue "class" (== "torrent_group")
             <<< multi (hasName "table") -< x
     let cat' = parseCategory cat
-    returnA -< ABTorrentGroup { torrentName = title
-                              , torrentCategory = cat'
-                              , seriesID = stripID serID
-                              , groupID = stripID grID
-                              , torrentImageURI = img
-                              , torrentTags = map stripeq tags
-                              , torrents = [attachInfo x' . parseInfo cat' $
-                                              torrentInfoSuffix x' | x' <- tors]
-                              }
+    returnA -< ABTorrentGroup
+                 { _torrentName = title
+                 , _torrentCategory = cat'
+                 , _seriesID = stripID serID
+                 , _groupID = stripID grID
+                 , _torrentImageURI = img
+                 , _torrentTags = map stripeq tags
+                 , _torrents = [attachInfo x' . parseInfo cat' $
+                                _torrentInfoSuffix x' | x' <- tors]
+                 }
   where
     havp atr content = hasAttrValue atr $ isInfixOf content
     havpa page = havp "href" (page ++ ".php") <<< css "a" <<< gTit
+    attachInfo t i = t & torrentInfo .~ i
 
-
-parseInfo :: Maybe Category -> String -> Information
-parseInfo (Just Anime) suf = parseAnimeInfo suf
-parseInfo (Just LiveAction) suf = parseAnimeInfo suf
-parseInfo (Just LiveActionSeries) suf = parseAnimeInfo suf
-parseInfo (Just (Manga _)) suf = parseMangaInfo suf
-parseInfo _ _ = NoInfo
-
-attachInfo :: ABTorrent -> Information -> ABTorrent
-attachInfo t i = t {torrentInfo = i}
+parseInfo :: Maybe Category -> String -> Maybe Information
+parseInfo (Just Anime) suf = Just $ parseAnimeInfo suf
+parseInfo (Just LiveAction) suf = Just $ parseAnimeInfo suf
+parseInfo (Just LiveActionSeries) suf = Just $ parseAnimeInfo suf
+parseInfo (Just (Manga _)) suf = Just $ parseMangaInfo suf
+parseInfo _ _ = Nothing
 
 extractNextPage
   :: (ArrowXml cat, ArrowChoice cat) =>
@@ -261,11 +261,11 @@ extractNextPage doc = doc /> css "div" >>> hasAttrValue "class" (== "pages")
 parsePage :: YukariSettings -> String -> IO (String, [ABTorrentGroup])
 parsePage ys html = do
   let doc = parseHtml html
-      site = baseSite $ siteSettings ys
+      site = ys ^. siteSettings . baseSite
   n <- runX $ extractNextPage doc
   gs <- runX $ extractTorrentGroups doc ys
   let next = safeApply (\x -> site ++ "/" ++ head x) n
-  return (next, map (groupPreprocessor $ siteSettings ys) gs)
+  return (next, map (ys ^. siteSettings . groupPreprocessor) gs)
 
 parseYenPage :: String -> IO YenPage
 parseYenPage body = do

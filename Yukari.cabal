@@ -45,7 +45,7 @@ library
   build-depends:       base ==4.*, curl ==1.3.*, HTTP ==4000.*, filepath ==1.3.*
                        , directory ==1.2.*, bytestring ==0.10.*, network ==2.5.*
                        , text ==1.1.1.*, attoparsec ==0.12.*, HandsomeSoup ==0.3.*
-                       , hxt ==9.*, download-curl ==0.1.*, dyre
+                       , hxt ==9.*, download-curl ==0.1.*, dyre, lens
 
   hs-source-dirs:       src
   exposed-modules:
@@ -70,4 +70,4 @@ test-suite spec
   --     Utils.Yukari.ConfigParserSpec
 
   build-depends:       base ==4.*, Yukari, hspec, QuickCheck == 2.*,
-                       filepath==1.3.*, directory ==1.2.*
+                       filepath==1.3.*, directory ==1.2.*, lens

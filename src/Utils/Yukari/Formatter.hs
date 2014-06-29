@@ -5,22 +5,22 @@ import Utils.Yukari.Types
 import Utils.Yukari.Settings
 
 verbPrint :: Verbosity -> YukariSettings -> [String] -> IO ()
-verbPrint v ys s = when (v <= logVerbosity ys) (putStrLn $ unwords s)
+verbPrint v ys s = when (v <= _logVerbosity ys) (putStrLn $ unwords s)
 
 prettyGroup :: ABTorrentGroup -> String
-prettyGroup g = torrentName g ++ " - " ++ show (torrentCategory g) ++ "\n"
-                ++ "Image: " ++ torrentImageURI g
-                ++ "\nTags: " ++ unwords (map (++ " ") $ torrentTags g)
-                ++ "\n" ++ unlines (map (indent.prettyTorrent) $ torrents g)
+prettyGroup g = _torrentName g ++ " - " ++ show (_torrentCategory g)
+                ++ "\nImage: " ++ _torrentImageURI g
+                ++ "\nTags: " ++ unwords (map (++ " ") $ _torrentTags g)
+                ++ "\n" ++ unlines (map (indent.prettyTorrent) $ _torrents g)
   where indent l = unlines $ map ("  \t" ++ ) $ lines l
 
 prettyTorrent :: ABTorrent -> String
-prettyTorrent t = torrentInfoSuffix t
-                  ++ "\tSize: " ++ show (torrentSize t)
-                  ++ "\tSeeders: " ++ show (torrentSeeders t)
-                  ++ "\nLink: " ++ torrentURI t
-                  ++ "\nDownload: " ++ torrentDownloadURI t
-                  ++ "\n" ++ prettyInfo (torrentInfo t)
+prettyTorrent t = _torrentInfoSuffix t
+                  ++ "\tSize: " ++ show (_torrentSize t)
+                  ++ "\tSeeders: " ++ show (_torrentSeeders t)
+                  ++ "\nLink: " ++ _torrentURI t
+                  ++ "\nDownload: " ++ _torrentDownloadURI t
+                  ++ "\n" ++ showM (fmap prettyInfo (_torrentInfo t))
 
 prettyResolution :: Maybe Resolution -> String
 prettyResolution Nothing = "Unknown"
@@ -31,19 +31,18 @@ showM Nothing = "Unknown"
 showM (Just a) = show a
 
 prettyInfo :: Information -> String
-prettyInfo i = case i of
-  NoInfo -> "No additional information."
-  AnimeInformation ai -> unlines
-                         [ "Format: " ++ showM (releaseFormat ai)
-                         , "Container: " ++ showM (videoContainer ai)
-                         , "Subtitles: " ++ prettySub (subtitles ai)
-                         , "Resolution: " ++ prettyResolution (resolution ai)
-                         , "Audio: " ++ show (audio ai)
-                         ]
-  MangaInformation mi -> unlines [ "Scanlated: " ++ boolYesNo (scanlated mi)
-                                 , "Archived: " ++ boolYesNo (archived mi)
-                                 , "Ongoing: " ++ boolYesNo (ongoing mi)
-                                 ]
+prettyInfo (AnimeInformation ai) =
+  unlines [ "Format: " ++ showM (_releaseFormat ai)
+          , "Container: " ++ showM (_videoContainer ai)
+          , "Subtitles: " ++ prettySub (_subtitles ai)
+          , "Resolution: " ++ prettyResolution (_resolution ai)
+          , "Audio: " ++ show (_audio ai)
+          ]
+prettyInfo (MangaInformation mi) =
+  unlines [ "Scanlated: " ++ boolYesNo (_scanlated mi)
+          , "Archived: " ++ boolYesNo (_archived mi)
+          , "Ongoing: " ++ boolYesNo (_ongoing mi)
+          ]
   where
     boolYesNo b = if b then "Yes" else "No"
 
