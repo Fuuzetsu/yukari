@@ -1,5 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
-module Utils.Yukari.Crawler (crawlFromURL, crawlFromFile, getSinglePage) where
+module Utils.Yukari.Crawler (crawlFromURL, crawlFromFile
+                            , getSinglePage, torrentFilter) where
 
 import Control.Lens hiding ((<.>))
 import           Control.Applicative
@@ -20,9 +21,11 @@ import           Utils.Yukari.Types
 
 type URL = String
 
--- | Filter out unwanated torrents as per specified function.
+-- | Filter out unwanated torrents as per specified function, removing
+-- groups without any torrents remaining post-filtering.
 torrentFilter :: (ABTorrent -> Bool) -> [ABTorrentGroup] -> [ABTorrentGroup]
-torrentFilter p = filter (null . view torrents) . map (torrents %~ filter p)
+torrentFilter p = filter (not . null . view torrents)
+                  . map (torrents %~ filter p)
 
 -- | Use the curl session to fetch a possibly login restricted page.
 getInternalPage :: YukariSettings -> Curl -> String -> IO (Maybe String)

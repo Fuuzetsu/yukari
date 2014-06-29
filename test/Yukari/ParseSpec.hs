@@ -4,6 +4,7 @@ module Yukari.ParseSpec (main, spec) where
 
 import Control.Applicative
 import Data.List
+import Utils.Yukari.Crawler
 import Utils.Yukari.Filters
 import Utils.Yukari.Parser
 import Utils.Yukari.Settings
@@ -65,13 +66,19 @@ spec = do
     it "picks up all individual torrents" $ do
       length . concatMap _torrents . snd <$> parse `shouldReturn` 12
 
-    it "finds right number of  unseeded torrents" $ do
+    it "finds right number of unseeded torrents" $ do
       length . filter isUnseeded . concatMap _torrents . snd <$> parse
+        `shouldReturn` 1
+
+      length . torrentFilter isUnseeded . snd <$> parse
         `shouldReturn` 1
 
     it "finds right number of seeded torrents" $ do
       length . filter isSeeded . concatMap _torrents . snd <$> parse
         `shouldReturn` 11
+
+      length . torrentFilter isSeeded . snd <$> parse
+        `shouldReturn` 7
 
     it "realises there's no next page" $ do
       fst <$> parse `shouldReturn` ""

@@ -171,8 +171,8 @@ getTorrent ys =
   nameAttr "tr" "class" isInfixOf "torrent  " >>>
     proc x -> do
       tID <- getAttrValue "id" -< x
-      tInfSuf <- concat .< (getText
-                            <\\ processTopDown (filterA . neg $ hasName "img")
+      tInfSuf <- concat .< (deep getText
+                            <<< processTopDown (filterA . neg $ hasName "img")
                             <<< hasAttrValue "href" infixIds <<< tda) -< x
       tLink <- hasAttrValue "href" infixIds ! "href" <<< tda -< x
       tDown <- css "a" ! "href" <<< getCssAttr "a" "title" "Download" -< x
@@ -183,7 +183,7 @@ getTorrent ys =
       returnA -< ABTorrent { _torrentID = read $ stripeg '_' tID
                            , _torrentURI = mainpage tLink
                            , _torrentDownloadURI = mainpage tDown
-                           , _torrentInfoSuffix = tInfSuf
+                           , _torrentInfoSuffix = dropWs tInfSuf
                            , _torrentInfo = Nothing
                            , _torrentSnatched = read tstch
                            , _torrentLeechers = read tlchr
@@ -196,6 +196,9 @@ getTorrent ys =
     getTorP x = getCssAttr "td" "class" x >>> deep getText
     getCssAttr t a eq = css t >>> hasAttrValue a (== eq)
     tda = deep (hasName "td") >>> deep (hasName "a")
+    dropWs ('\t':xs) = dropWs xs
+    dropWs ('\n':xs) = dropWs xs
+    dropWs xs = xs
 
 extractTorrentGroups
   :: ArrowXml cat =>
