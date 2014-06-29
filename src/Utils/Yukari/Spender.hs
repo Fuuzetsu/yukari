@@ -1,6 +1,7 @@
 module Utils.Yukari.Spender (spendYen) where
 
 import Control.Arrow (second)
+import Control.Lens
 import Utils.Yukari.Settings
 import Utils.Yukari.Crawler (getSinglePage)
 import Utils.Yukari.Formatter
@@ -9,16 +10,16 @@ import Utils.Yukari.Types
 
 spendYen :: YukariSettings -> IO ()
 spendYen ys = do
-  body <- getSinglePage ys (yenSite $ spendSettings ys)
+  body <- getSinglePage ys (ys ^. spendSettings . yenSite)
   case body of
-    Nothing -> putStrLn $ "Failed to fetch " ++ yenSite (spendSettings ys)
+    Nothing -> putStrLn $ "Failed to fetch " ++ ys ^. spendSettings . yenSite
     Just x -> do
       page <- parseYenPage x
-      verbPrint Low ys ["Currently have", show $ yenOwned page, "yen."]
+      verbPrint Low ys ["Currently have", show $ page ^. yenOwned, "yen."]
       verbPrint High ys ["Leftover yen limit set to"
-                        , show . yenLeftOver $ spendSettings ys]
+                        , show $ ys ^. spendSettings . yenLeftOver]
 
-      case chooseOptimal (spendSettings ys) (attachBase page) of
+      case chooseOptimal (ys ^. spendSettings) (attachBase page) of
         Nothing -> verbPrint Low ys ["No viable spending option found"]
         Just (cost, link) -> do
           verbPrint Low ys ["Spending", show cost, "yen."]
@@ -29,8 +30,8 @@ spendYen ys = do
     -- the full link of the base site, adding the ‘/’ separator
     attachBase :: YenPage -> YenPage
     attachBase yp =
-      let bs = baseSite (siteSettings ys) ++ "/"
-      in yp { spendingLinks = map (second (bs ++)) (spendingLinks yp) }
+      let bs = ys ^. siteSettings . baseSite ++ "/"
+      in yp & spendingLinks %~ map (second (bs ++))
 
 
 chooseOptimal :: SpendSettings -> YenPage -> Maybe (Cost, String)
@@ -43,7 +44,7 @@ chooseOptimal ys yp = let l = filterUnwanted ys yp
   where
     filterUnwanted :: SpendSettings -> YenPage -> [(Cost, String)]
     filterUnwanted st pg =
-      let yOwned' = yenOwned pg
-          yenLeft' = yenLeftOver st
-          links = spendingLinks pg
+      let yOwned' = pg ^. yenOwned
+          yenLeft' = st ^. yenLeftOver
+          links = pg ^. spendingLinks
       in filter (\(c, _) -> yOwned' - c >= 0 && yOwned' - c >= yenLeft') links

@@ -159,23 +159,11 @@ nAt = nameAttr "span" "class" (==)
 gTit :: ArrowXml cat => cat (NTree XNode) XmlTree
 gTit = nAt "group_title"
 
-text :: ArrowXml cat => cat (NTree XNode) String
-text = getChildren >>> getText
-
 (.<) :: ArrowList a => ([c] -> d) -> a b c -> a b d
 (.<) = flip (>.)
 
 (<\\) :: (ArrowTree a, Tree t) => a (t c) d -> a b (t c) -> a b d
 (<\\) = flip (//>)
-
-
-getCssAttr
-  :: ArrowXml cat =>
-     String -> String -> String -> cat (NTree XNode) XmlTree
-getCssAttr t a eq = css t >>> hasAttrValue a (== eq)
-
-getTorP :: ArrowXml cat => String -> cat (NTree XNode) XmlTree
-getTorP = getCssAttr "td" "class"
 
 getTorrent
   :: ArrowXml cat => YukariSettings -> cat (NTree XNode) ABTorrent
@@ -185,15 +173,13 @@ getTorrent ys =
       tID <- getAttrValue "id" -< x
       tInfSuf <- concat .< (getText
                             <\\ processTopDown (filterA . neg $ hasName "img")
-                            <<< hasAttrValue "href" infixIds
-                            <<< deep (hasName "a") <<< deep (hasName "td")) -< x
-      tLink <- getAttrValue "href" <<< hasAttrValue "href" infixIds
-               <<< deep (hasName "a") <<< deep (hasName "td") -< x
+                            <<< hasAttrValue "href" infixIds <<< tda) -< x
+      tLink <- hasAttrValue "href" infixIds ! "href" <<< tda -< x
       tDown <- css "a" ! "href" <<< getCssAttr "a" "title" "Download" -< x
-      tstch <- deep getText <<< getTorP "torrent_snatched" -< x
-      tlchr <- deep getText <<< getTorP "torrent_leechers" -< x
-      tsdr <- deep getText <<< getTorP "torrent_seeders" -< x
-      tsize <- deep getText <<< getTorP "torrent_size" -< x
+      tstch <- getTorP "torrent_snatched" -< x
+      tlchr <- getTorP "torrent_leechers" -< x
+      tsdr  <- getTorP "torrent_seeders" -< x
+      tsize <- getTorP "torrent_size" -< x
       returnA -< ABTorrent { _torrentID = read $ stripeg '_' tID
                            , _torrentURI = mainpage tLink
                            , _torrentDownloadURI = mainpage tDown
@@ -207,6 +193,9 @@ getTorrent ys =
   where
     infixIds x = "php?id=" `isInfixOf` x && "torrentid=" `isInfixOf` x
     mainpage x = ys ^. siteSettings . baseSite ++ "/" ++ x
+    getTorP x = getCssAttr "td" "class" x >>> deep getText
+    getCssAttr t a eq = css t >>> hasAttrValue a (== eq)
+    tda = deep (hasName "td") >>> deep (hasName "a")
 
 extractTorrentGroups
   :: ArrowXml cat =>
@@ -214,13 +203,11 @@ extractTorrentGroups
 extractTorrentGroups doc ys =
   doc //> css "div" >>> havp "class" "group_cont" >>>
   proc x -> do
-    cat <- text <<< css "a" <<< nameAttr "span" "class" (==) "cat"  -< x
+    cat <- nameAttr "span" "class" (==) "cat" >>> css "a" /> getText -< x
     img <- css "img" ! "src" <<< nAt "mainimg" -< x
-    serID <- getAttrValue "href" <<< havp "href" "series.php"
-             <<< css "a" <<< gTit -< x
-    grID <- getAttrValue "href" <<< havp "href" "torrents.php"
-            <<< css "a" <<< gTit -< x
-    title <- getText <<< getChildren <<< havpa "series"-< x
+    serID <- havp "href" "series.php" ! "href" <<< css "a" <<< gTit -< x
+    grID <- havp "href" "torrents.php" ! "href" <<< css "a" <<< gTit -< x
+    title <- havpa "series" /> getText -< x
     tags <- listA $ css "a" ! "href" <<< hasAttrValue "class" (== "tags_sm")
             <<< multi (hasName "div") -< x
     tors <- listA (getTorrent ys) <<< hasAttrValue "class" (== "torrent_group")
@@ -271,10 +258,9 @@ parseYenPage :: String -> IO YenPage
 parseYenPage body = do
   let doc = parseHtml body
   yen <- runX $ doc //> hasAttrValue "href" (== "/konbini.php") /> getText
-  links <- runX $ (doc //> hasName "a" >>> getAttrValue "href")
-           >>. filter isExchange
-  return YenPage { yenOwned = yenToInt $ head yen
-                 , spendingLinks = mapMaybe linksToCostLinks links
+  links <- runX $ doc //> hasName "a" ! "href" >>. filter isExchange
+  return YenPage { _yenOwned = yenToInt $ head yen
+                 , _spendingLinks = mapMaybe linksToCostLinks links
                  }
     where
       yenToInt = read . reverse . takeWhile isDigit . reverse . filter (/= ',')

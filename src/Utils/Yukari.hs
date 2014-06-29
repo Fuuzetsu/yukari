@@ -2,6 +2,7 @@
 module Utils.Yukari where
 
 import qualified Config.Dyre as Dyre
+import           Control.Lens
 import           Control.Monad
 import           System.Directory
 import           System.Environment
@@ -33,7 +34,7 @@ realMain Nothing = do
   putStrLn "Please set up your ~/.yukari/Yukari.hs"
   exitFailure
 realMain (Just ys) = do
-  let ps = programSettings ys
+  let ps = ys ^. programSettings
   args <- getArgs
   unless (null args) $ do
     putStrLn $ "This program currently takes no arguments. "

@@ -86,7 +86,7 @@ abSiteSettings = SiteSettings
     -- We fix that here.
     fixImageLinks :: ABTorrentGroup -> ABTorrentGroup
     fixImageLinks = torrentImageURI %~ \i -> if "//" `isPrefixOf` i
-                                             then "https" ++ i
+                                             then "https:" ++ i
                                              else i
 
 abSpendSettings :: SpendSettings

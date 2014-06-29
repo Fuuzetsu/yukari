@@ -13,31 +13,31 @@ import Test.Hspec
 
 yukariSettings :: YukariSettings
 yukariSettings = YukariSettings
-  { siteSettings = siteSettings'
-  , spendSettings = spendSettings'
-  , programSettings = [DryRun]
-  , logVerbosity = Quiet
-  , connectionRetries = 0
-  , maxPages = 999999
+  { _siteSettings = siteSettings'
+  , _spendSettings = spendSettings'
+  , _programSettings = [DryRun]
+  , _logVerbosity = Quiet
+  , _connectionRetries = 0
+  , _maxPages = 999999
   }
 
 spendSettings' :: SpendSettings
-spendSettings' = SpendSettings { yenSite = "https://animebytes.tv/konbini.php"
-                               , yenLeftOver = 999999999999
+spendSettings' = SpendSettings { _yenSite = "https://animebytes.tv/konbini.php"
+                               , _yenLeftOver = 999999999999
                                }
 
 siteSettings' :: SiteSettings
 siteSettings' = SiteSettings
-  { username = "TestUser"
-  , password = "TestPassword"
-  , baseSite = "https://animebytes.tv"
-  , loginSite = "https://animebytes.tv/login.php"
-  , searchSite = "https://animebytes.tv/torrents.php"
-  , topWatch = Nothing
-  , watchFunc = const Nothing
-  , filterFunc = const False
-  , clobberFiles = False
-  , groupPreprocessor = id
+  { _username = "TestUser"
+  , _password = "TestPassword"
+  , _baseSite = "https://animebytes.tv"
+  , _loginSite = "https://animebytes.tv/login.php"
+  , _searchSite = "https://animebytes.tv/torrents.php"
+  , _topWatch = Nothing
+  , _watchFunc = const Nothing
+  , _filterFunc = const False
+  , _clobberFiles = False
+  , _groupPreprocessor = id
   }
 
 testDir :: FilePath
@@ -61,7 +61,7 @@ spec = do
       length . snd <$> parse `shouldReturn` 7
 
     it "picks up all individual torrents" $ do
-      length . concatMap torrents . snd <$> parse `shouldReturn` 12
+      length . concatMap _torrents . snd <$> parse `shouldReturn` 12
 
     it "realises there's no next page" $ do
       fst <$> parse `shouldReturn` ""
@@ -120,24 +120,24 @@ spec = do
 
       count x = length . elemIndices x
 
-      countCategory x = count x . map torrentCategory . snd
+      countCategory x = count x . map _torrentCategory . snd
 
-      getInfo = map torrentInfo . concatMap torrents . snd
+      getInfo = map _torrentInfo . concatMap _torrents . snd
 
       getAudio p = audio' p . getInfo
         where
-          audio' :: (Audio -> Bool) -> [Information] -> [Audio]
+          audio' :: (Audio -> Bool) -> [Maybe Information] -> [Audio]
           audio' p' info =
-            let audioInfo  = [ audio x | AnimeInformation x <- info ]
+            let audioInfo  = [ _audio x | Just (AnimeInformation x) <- info ]
             in filter p' audioInfo
 
       countAudio p = length . getAudio p
 
       getSubs p = subs p . getInfo
         where
-          subs :: (Subtitles -> Bool) -> [Information] -> [Subtitles]
+          subs :: (Subtitles -> Bool) -> [Maybe Information] -> [Subtitles]
           subs p' info =
-            let aniInfo = [ subtitles x | AnimeInformation x <- info ]
+            let aniInfo = [ _subtitles x | Just (AnimeInformation x) <- info ]
             in filter p' aniInfo
 
       countSub p = length . getSubs p

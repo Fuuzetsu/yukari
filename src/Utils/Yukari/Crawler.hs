@@ -1,6 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 module Utils.Yukari.Crawler (crawlFromURL, crawlFromFile, getSinglePage) where
 
+import Control.Lens hiding ((<.>))
 import           Control.Applicative
 import           Control.Arrow ((&&&))
 import           Control.Monad
@@ -21,18 +22,14 @@ type URL = String
 
 -- | Filter out unwanated torrents as per specified function.
 torrentFilter :: (ABTorrent -> Bool) -> [ABTorrentGroup] -> [ABTorrentGroup]
-torrentFilter _ [] = []
-torrentFilter p (g:gs) = let ng = g { torrents = filter p $ torrents g }
-                         in case torrents ng of
-                           [] -> torrentFilter p gs
-                           _ -> ng : torrentFilter p gs
+torrentFilter p = filter (null . view torrents) . map (torrents %~ filter p)
 
 -- | Use the curl session to fetch a possibly login restricted page.
 getInternalPage :: YukariSettings -> Curl -> String -> IO (Maybe String)
 getInternalPage ys curl url = do
   r <- do_curl_ curl url method_GET :: IO CurlResponse
   if respCurlCode r /= CurlOK
-    then retryFetch r $ connectionRetries ys
+    then retryFetch r $ _connectionRetries ys
     else return . Just $ respBody r
   where
     retryFetch :: CurlResponse -> Integer -> IO (Maybe String)
@@ -49,7 +46,7 @@ getInternalPage ys curl url = do
                             , attemptFormat $ ret - 1
                             , "remaining."
                             ]
-          getInternalPage (ys { connectionRetries = ret - 1 }) curl url
+          getInternalPage (ys { _connectionRetries = ret - 1 }) curl url
       where
         attemptFormat 1 = "attempt"
         attemptFormat _ = "attempts"
@@ -59,7 +56,7 @@ getInternalPage ys curl url = do
 -- and this is only done once per log in anyway.
 banned :: SiteSettings -> IO Bool
 banned s = do
-  (_, body) <- curlGetString (loginSite s) []
+  (_, body) <- curlGetString (s ^. loginSite) []
   return $ "You are banned from logging in for another " `isInfixOf` body
 
 -- | As someone thought that _obviously_ the best way to inform
@@ -70,16 +67,16 @@ banned s = do
 -- we probably made it.
 loggedIn :: YukariSettings -> Curl -> IO Bool
 loggedIn s c = do
-  let settings = siteSettings s
-  body <- getInternalPage s c (baseSite settings)
+  let settings = s ^. siteSettings
+  body <- getInternalPage s c (settings ^. baseSite)
   case body of
     Nothing -> error "Failed to successfully grab the login page."
     Just body' -> do
       let b = "forums.php" `isInfixOf` body'
       unless b $ verbPrint Debug s [ "Failed to log in. username:"
-                                   , username settings
+                                   , settings ^. username
                                    , "password:"
-                                   , password settings
+                                   , settings ^. password
                                      ++ "\nBody:\n" ++ body'
                                    ]
       return $ "forums.php" `isInfixOf` body'
@@ -87,21 +84,21 @@ loggedIn s c = do
 -- | Log in to the site.
 logonCurl :: YukariSettings -> IO Curl
 logonCurl ys = do
-  let s = siteSettings ys
+  let s = ys ^. siteSettings
   b <- banned s
   when b $ do
     putStrLn "Seems you have been banned from logging in. Check the site."
     exitFailure
 
-  let fields = CurlPostFields [ "username=" ++ username s
-                              , "password=" ++ password s ] : method_POST
+  let fields = CurlPostFields [ "username=" ++ s ^. username
+                              , "password=" ++ s ^. password ] : method_POST
   curl <- initialize
   setopts curl [ CurlCookieJar "cookies", CurlUserAgent defaultUserAgent
                , CurlTimeout 15 ]
-  r <- do_curl_ curl (loginSite s) fields :: IO CurlResponse
+  r <- do_curl_ curl (s ^. loginSite) fields :: IO CurlResponse
   l <- loggedIn ys curl
   if respCurlCode r /= CurlOK || not l
-    then error $ concat ["Failed to log in as ", username s, ": "
+    then error $ concat ["Failed to log in as ", s ^. username, ": "
                         , show $ respCurlCode r, " -- ", respStatusLine r]
     else return curl
 
@@ -110,9 +107,9 @@ logonCurl ys = do
 crawl :: YukariSettings -> Curl -> String -> IO ()
 crawl _ _ "" = return ()
 crawl ys curl url
-  | maxPages ys <= 0 = return ()
+  | ys ^. maxPages <= 0 = return ()
   | otherwise = do
-    let settings = siteSettings ys
+    let settings = ys ^. siteSettings
     verbPrint Low ys ["Crawling", url]
     body <- getInternalPage ys curl url
     case body of
@@ -120,31 +117,31 @@ crawl ys curl url
       Just body' -> do
         verbPrint Debug ys ['\n' : body']
         pa@(nextPage, groups) <- parsePage ys body'
-        when (logVerbosity ys >= High) (prettyPage pa)
-        verbPrint Low ys ["Have", show . sum $ map (length . torrents) groups
+        when (ys ^. logVerbosity >= High) (prettyPage pa)
+        verbPrint Low ys ["Have", show . sum $ map (length . _torrents) groups
                          , "torrents pre-filter."]
-        let filtered = torrentFilter (filterFunc settings) groups
-        let tPaths = concatMap (buildTorrentPaths settings) filtered
+        let filtered' = torrentFilter (_filterFunc settings) groups
+        let tPaths = concatMap (buildTorrentPaths settings) filtered'
         verbPrint Low ys ["Have", show $ length tPaths, "torrents post-filter."]
         mapM_ (\(fp, url') -> download fp url' ys) tPaths
-        crawl (ys { maxPages = maxPages ys - 1 }) curl nextPage
+        crawl (ys { _maxPages = _maxPages ys - 1 }) curl nextPage
 
 -- | We take settings for the site and a torrent group listing and we try to
 -- assign a file path to each torrent in the group to which the download
 -- will be made.
 buildTorrentPaths :: SiteSettings -> ABTorrentGroup -> [(Maybe FilePath, URL)]
-buildTorrentPaths set g =
-  map (makePath &&& torrentDownloadURI) $ torrents g
+buildTorrentPaths sett g =
+  map (makePath &&& _torrentDownloadURI) $ _torrents g
   where
     makePath :: ABTorrent -> Maybe FilePath
-    makePath tor = case torrentCategory g of
+    makePath tor = case _torrentCategory g of
       Nothing -> Nothing
-      Just cat -> foldl (liftA2 (</>)) (topWatch set)
-                  [ watchFunc set cat
-                  , Just $ unwords [ torrentName g, "-"
+      Just cat -> foldl (liftA2 (</>)) (_topWatch sett)
+                  [ _watchFunc sett cat
+                  , Just $ unwords [ _torrentName g, "-"
                                    , show cat
                                    , "~"
-                                   , torrentInfoSuffix tor <.> "torrent"
+                                   , _torrentInfoSuffix tor <.> "torrent"
                                    ]
                   ]
 
@@ -159,9 +156,9 @@ crawlFromFile ys f = do
 -- | Starts the crawl from the URL specified in the settings.
 crawlFromURL :: YukariSettings -> IO ()
 crawlFromURL ys = do
-  let settings = siteSettings ys
+  let settings = ys ^. siteSettings
   curl <- logonCurl ys
-  crawl ys curl $ searchSite settings
+  crawl ys curl $ _searchSite settings
 
 -- | Logs the user in with 'logonCurl' and fetches a single page using
 -- 'getInternalPage'. Useful when we just want to grab something quickly.
@@ -174,8 +171,8 @@ download :: Maybe FilePath -- ^ The file to save to.
             -> URL -- ^ The URL to download from.
             -> YukariSettings -> IO ()
 download path url ys =
-  let clobber = clobberFiles $ siteSettings ys
-      dry = DryRun `elem` programSettings ys
+  let clobber = ys ^. siteSettings . clobberFiles
+      dry = DryRun `elem` ys ^. programSettings
   in
   case path of
     Nothing -> verbPrint Low ys ["Skipping empty path."]

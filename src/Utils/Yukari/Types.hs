@@ -84,8 +84,8 @@ data Category = Anime | Artbook | LiveAction | Game | GameGuide | LightNovel
 
 type Cost = Integer
 
-data YenPage = YenPage { yenOwned :: Integer
-                       , spendingLinks :: [(Cost, String)]
+data YenPage = YenPage { _yenOwned :: Integer
+                       , _spendingLinks :: [(Cost, String)]
                        } deriving Show
 
 makeLenses ''ABTorrent
@@ -94,3 +94,4 @@ makeLenses ''AnimeInfo
 makeLenses ''MangaInfo
 makeLenses ''ReleaseFormat
 makeLenses ''Resolution
+makeLenses ''YenPage
