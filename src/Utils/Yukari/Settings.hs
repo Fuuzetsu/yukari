@@ -23,6 +23,7 @@ data SiteSettings = SiteSettings { _username :: String
                                  , _topWatch :: Maybe FilePath
                                  , _watchFunc :: Category -> Maybe FilePath
                                  , _filterFunc :: ABTorrent -> Bool
+                                 , _groupFilterFunc :: ABTorrentGroup -> Bool
                                  , _clobberFiles :: Bool
                                  , _groupPreprocessor :: ABTorrentGroup
                                                       -> ABTorrentGroup
@@ -51,6 +52,7 @@ minimalSettings u p l = SiteSettings { _username = u
                                      , _searchSite = ""
                                      , _topWatch = Nothing
                                      , _watchFunc = const Nothing
+                                     , _groupFilterFunc = const True
                                      , _filterFunc = const True
                                      , _clobberFiles = False
                                      , _groupPreprocessor = id
@@ -76,6 +78,7 @@ abSiteSettings = SiteSettings
   , _searchSite = "https://animebytes.tv/torrents.php"
   , _topWatch = Nothing
   , _watchFunc = const Nothing
+  , _groupFilterFunc = const True
   , _filterFunc = const False
   , _clobberFiles = False
   , _groupPreprocessor = fixImageLinks

@@ -20,7 +20,9 @@ prettyTorrent t = _torrentInfoSuffix t
                   ++ "\tSeeders: " ++ show (_torrentSeeders t)
                   ++ "\nLink: " ++ _torrentURI t
                   ++ "\nDownload: " ++ _torrentDownloadURI t
-                  ++ "\n" ++ showM (fmap prettyInfo (_torrentInfo t))
+                  ++ "\n" ++ case fmap prettyInfo (_torrentInfo t) of
+                    Nothing -> "Unknown"
+                    Just x -> x
 
 prettyResolution :: Maybe Resolution -> String
 prettyResolution Nothing = "Unknown"

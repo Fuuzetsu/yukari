@@ -252,7 +252,8 @@ parsePage ys html = do
   n <- runX $ extractNextPage doc
   gs <- runX $ extractTorrentGroups doc ys
   let next = safeApply (\x -> site ++ "/" ++ head x) n
-  return (next, map (ys ^. siteSettings . groupPreprocessor) gs)
+      gs' = filter (ys ^. siteSettings . groupFilterFunc) gs
+  return (next, map (ys ^. siteSettings . groupPreprocessor) gs')
 
 parseYenPage :: String -> IO YenPage
 parseYenPage body = do
